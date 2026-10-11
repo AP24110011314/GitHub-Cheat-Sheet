@@ -1,5 +1,7 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { ExternalLink, Funnel, RotateCcw, SearchX, Star, Workflow as WorkflowIcon } from "lucide-react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { CategoryNav, type CategoryFilter } from "./components/CategoryNav";
+import { CATEGORY_ICONS, ICON_STROKE } from "./components/categoryIcons";
 import { CommandCard } from "./components/CommandCard";
 import { DifficultyBadge } from "./components/DifficultyBadge";
 import { FavoritesView } from "./components/FavoritesView";
@@ -15,6 +17,9 @@ import { useTheme } from "./hooks/useTheme";
 type DifficultyFilter = Difficulty | "all";
 
 const DIFFICULTY_OPTIONS: DifficultyFilter[] = ["all", "Beginner", "Intermediate", "Advanced"];
+
+// TODO: point this at the real repository URL after publishing.
+const REPO_URL = "https://github.com/";
 
 function matchesQuery(haystack: string, q: string): boolean {
   return haystack.toLowerCase().includes(q);
@@ -91,10 +96,10 @@ export default function App() {
   const showFavoritesView = category === "favorites" && !debouncedQuery && difficulty === "all";
 
   return (
-    <div className="min-h-screen bg-slate-100 text-slate-900 dark:bg-[#010409] dark:text-slate-100">
+    <div className="min-h-screen bg-[var(--page)] text-[var(--text)]">
       <a
         href="#commands"
-        className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded focus:bg-indigo-600 focus:px-3 focus:py-2 focus:text-white"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded focus:bg-[var(--accent)] focus:px-3 focus:py-2 focus:text-white"
       >
         Skip to commands
       </a>
@@ -102,60 +107,65 @@ export default function App() {
       {/* ── Hero ─────────────────────────────────────────── */}
       <header className="relative overflow-hidden bg-[#0d1117] text-white print:bg-white print:text-black">
         <div aria-hidden="true" className="print-hidden pointer-events-none absolute inset-0">
-          <div className="hero-orb absolute -top-32 -left-24 h-96 w-96 rounded-full bg-indigo-600/30 blur-3xl" />
+          <div className="hero-orb absolute -top-32 -left-24 h-96 w-96 rounded-full bg-[#2f81f7]/25 blur-3xl" />
           <div
-            className="hero-orb absolute -top-20 right-0 h-80 w-80 rounded-full bg-violet-600/25 blur-3xl"
+            className="hero-orb absolute -top-20 right-0 h-80 w-80 rounded-full bg-[#a371f7]/20 blur-3xl"
             style={{ animationDelay: "-7s" }}
           />
           <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.035)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.035)_1px,transparent_1px)] bg-[size:44px_44px] [mask-image:radial-gradient(ellipse_70%_80%_at_50%_0%,black,transparent)]" />
         </div>
 
-        <div className="relative mx-auto flex max-w-6xl flex-col gap-6 px-4 pt-10 pb-8 sm:px-6 sm:pt-14">
-          <div className="flex flex-wrap items-start justify-between gap-4">
-            <div className="flex items-start gap-4">
-              <div
-                aria-hidden="true"
-                className="hidden h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 via-violet-500 to-fuchsia-500 shadow-[0_8px_30px_-6px_rgba(139,92,246,0.7)] sm:flex"
-              >
-                <svg viewBox="0 0 16 16" className="h-7 w-7 text-white" fill="currentColor">
-                  <path d="M1.75 0h12.5C15.216 0 16 .784 16 1.75v12.5A1.75 1.75 0 0 1 14.25 16H1.75A1.75 1.75 0 0 1 0 14.25V1.75C0 .784.784 0 1.75 0ZM5.5 4.5a.75.75 0 0 0-1.061 1.06l2.72 2.72-2.72 2.72a.75.75 0 1 0 1.06 1.06l3.25-3.25a.75.75 0 0 0 0-1.06Zm4.75.75a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5H11a.75.75 0 0 1-.75-.75Z" />
-                </svg>
-              </div>
-              <div>
-                <p className="font-mono text-xs text-slate-400">
-                  <span aria-hidden="true" className="text-emerald-400">$ </span>git help
-                  --daily-reference
-                </p>
-                <h1 className="mt-1.5 text-3xl font-extrabold tracking-tight sm:text-[2.75rem] sm:leading-[1.05]">
-                  GitHub Commands{" "}
-                  <span className="bg-gradient-to-r from-indigo-300 via-violet-300 to-fuchsia-300 bg-clip-text text-transparent">
-                    Cheat Sheet
-                  </span>
-                </h1>
-                <p className="mt-2 max-w-2xl text-[15px] text-slate-400">
-                  The commands you actually use, searchable in milliseconds. Fast, beautiful, and
-                  fully offline.
-                </p>
-              </div>
-            </div>
+        <div className="relative mx-auto flex max-w-6xl flex-col px-4 pt-6 pb-10 sm:px-6 sm:pt-8">
+          <div className="hero-enter flex items-center justify-between gap-3">
+            <p className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1 font-mono text-[11px] text-slate-300">
+              <span aria-hidden="true" className="h-2 w-2 rounded-full bg-[#3fb950]" />
+              git help --daily-reference
+            </p>
             <div className="flex items-center gap-2">
               <ThemeToggle theme={theme} onToggle={toggle} />
               <button
                 type="button"
                 onClick={() => window.print()}
                 aria-label="Print or download as PDF"
-                className="print-hidden inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/10 px-3 py-2 text-sm font-medium text-white backdrop-blur transition-all hover:bg-white/20 active:scale-95"
+                className="print-hidden hidden items-center gap-2 rounded-xl border border-white/20 bg-white/10 px-3 py-2 text-sm font-medium text-white backdrop-blur transition-all hover:bg-white/20 active:scale-95 sm:inline-flex"
               >
-                <svg aria-hidden="true" viewBox="0 0 16 16" className="h-4 w-4" fill="currentColor">
-                  <path d="M3.5 1.75a.25.25 0 0 1 .25-.25h8.5a.25.25 0 0 1 .25.25v1.5a.75.75 0 0 0 1.5 0v-1.5A1.75 1.75 0 0 0 12.25 0h-8.5A1.75 1.75 0 0 0 2 1.75v9.5c0 .966.784 1.75 1.75 1.75h1v1.5c0 .138.112.25.25.25h6a.25.25 0 0 0 .25-.25V13h1c.966 0 1.75-.784 1.75-1.75v-5a.75.75 0 0 0-1.5 0v5a.25.25 0 0 1-.25.25h-8.5a.25.25 0 0 1-.25-.25Z" />
-                  <path d="M6 11.5a.25.25 0 0 1 .25-.25h3.5a.25.25 0 0 1 .25.25v1.75a.75.75 0 0 1-.75.75h-2.5a.75.75 0 0 1-.75-.75Z" />
-                </svg>
                 Print / PDF
               </button>
             </div>
           </div>
 
-          <dl className="flex flex-wrap gap-2.5" aria-label="Cheat sheet statistics">
+          <div className="hero-enter mx-auto mt-8 flex max-w-2xl flex-col items-center text-center" style={{ animationDelay: "80ms" }}>
+            <h1 className="text-4xl font-extrabold tracking-tight text-balance sm:text-6xl">
+              GitHub Commands{" "}
+              <span className="bg-gradient-to-r from-[#79c0ff] via-[#a371f7] to-[#f778ba] bg-clip-text text-transparent">
+                Cheat Sheet
+              </span>
+            </h1>
+            <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-slate-400 sm:text-base">
+              Every Git &amp; <span className="font-mono text-[13px] text-slate-300">gh</span> command
+              worth memorizing — searchable in milliseconds, available fully offline.
+            </p>
+          </div>
+
+          <div className="hero-enter mx-auto mt-6 w-full max-w-2xl" style={{ animationDelay: "160ms" }}>
+            <SearchBar
+              value={query}
+              onChange={setQuery}
+              onClear={() => {
+                setQuery("");
+                searchRef.current?.focus();
+              }}
+              inputRef={searchRef}
+              resultCount={filtered.length}
+              totalCount={COMMANDS.length}
+            />
+          </div>
+
+          <dl
+            className="hero-enter mx-auto mt-5 flex flex-wrap justify-center gap-2.5"
+            style={{ animationDelay: "220ms" }}
+            aria-label="Cheat sheet statistics"
+          >
             {[
               [`${COMMANDS.length}`, "commands"],
               [`${CATEGORIES.length}`, "categories"],
@@ -183,32 +193,24 @@ export default function App() {
       </header>
 
       {/* ── Sticky toolbar ───────────────────────────────── */}
-      <div className="print-hidden sticky top-0 z-20 border-b border-slate-200/80 bg-slate-100/85 backdrop-blur-xl dark:border-white/10 dark:bg-[#010409]/85">
-        <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-3 sm:px-6">
-          <SearchBar
-            value={query}
-            onChange={setQuery}
-            onClear={() => {
-              setQuery("");
-              searchRef.current?.focus();
-            }}
-            inputRef={searchRef}
-            resultCount={filtered.length}
+      <div
+        className="print-hidden sticky top-0 z-20 border-b backdrop-blur-xl"
+        style={{ borderColor: "var(--border)", backgroundColor: "color-mix(in srgb, var(--page) 88%, transparent)" }}
+      >
+        <div className="mx-auto flex max-w-6xl flex-col gap-2.5 px-4 py-3 sm:px-6">
+          <CategoryNav
+            selected={category}
+            onSelect={setCategory}
+            counts={counts}
+            favoritesCount={favoriteIds.length}
             totalCount={COMMANDS.length}
           />
-          <div className="flex flex-wrap items-center gap-2">
-            <div className="min-w-0 flex-1">
-              <CategoryNav
-                selected={category}
-                onSelect={setCategory}
-                counts={counts}
-                favoritesCount={favoriteIds.length}
-                totalCount={COMMANDS.length}
-              />
-            </div>
-          </div>
           <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label="Filter by difficulty">
-            <span className="mr-1 text-xs font-semibold tracking-wide text-slate-500 uppercase dark:text-slate-400">
+            <span
+              className="mr-1 inline-flex items-center gap-1 text-[11px] font-semibold tracking-wider uppercase"
+              style={{ color: "var(--muted)" }}
+            >
+              <Funnel size={12} strokeWidth={ICON_STROKE} aria-hidden="true" />
               Level
             </span>
             {DIFFICULTY_OPTIONS.map((opt) =>
@@ -218,11 +220,12 @@ export default function App() {
                   type="button"
                   onClick={() => setDifficulty(opt)}
                   aria-pressed={difficulty === opt}
-                  className={`rounded-full px-3 py-1 text-xs font-semibold transition-all active:scale-95 ${
+                  className="rounded-full px-3 py-1 text-xs font-semibold transition-all active:scale-95"
+                  style={
                     difficulty === opt
-                      ? "bg-slate-900 text-white shadow dark:bg-white dark:text-slate-900"
-                      : "text-slate-500 hover:bg-slate-200/70 hover:text-slate-800 dark:text-slate-400 dark:hover:bg-white/10 dark:hover:text-white"
-                  }`}
+                      ? { backgroundColor: "var(--text)", color: "var(--page)" }
+                      : { color: "var(--muted)" }
+                  }
                 >
                   All levels
                 </button>
@@ -232,9 +235,13 @@ export default function App() {
                   type="button"
                   onClick={() => setDifficulty(opt)}
                   aria-pressed={difficulty === opt}
-                  className={`rounded-full p-0.5 transition-all active:scale-95 ${
-                    difficulty === opt ? "ring-2 ring-indigo-500 ring-offset-2 dark:ring-offset-slate-950" : "opacity-80 hover:opacity-100"
-                  }`}
+                  aria-label={`Filter by ${opt} difficulty`}
+                  className="rounded-full p-0.5 transition-all active:scale-95"
+                  style={
+                    difficulty === opt
+                      ? { outline: "2px solid var(--accent)", outlineOffset: "2px" }
+                      : { opacity: 0.75 }
+                  }
                 >
                   <DifficultyBadge level={opt} />
                 </button>
@@ -242,8 +249,10 @@ export default function App() {
             )}
             <a
               href="#workflows"
-              className="ml-auto inline-flex items-center gap-1 text-xs font-semibold text-indigo-600 hover:underline dark:text-indigo-400"
+              className="ml-auto inline-flex items-center gap-1 text-xs font-semibold hover:underline"
+              style={{ color: "var(--accent)" }}
             >
+              <WorkflowIcon size={13} strokeWidth={ICON_STROKE} aria-hidden="true" />
               Common workflows
               <span aria-hidden="true">↓</span>
             </a>
@@ -255,8 +264,9 @@ export default function App() {
         {showFavoritesView ? (
           <section aria-label="Favorite commands">
             <SectionHeading
+              icon={<Star size={18} strokeWidth={ICON_STROKE} aria-hidden="true" />}
+              iconColor="var(--warning)"
               title="Your favorites"
-              glyph="★"
               blurb="Your starred commands, saved in this browser."
             />
             <FavoritesView
@@ -269,37 +279,51 @@ export default function App() {
           </section>
         ) : grouped ? (
           <div className="flex flex-col gap-12">
-            {grouped.map(({ category: cat, commands }) => (
-              <section key={cat.id} aria-label={cat.name} id={`cat-${cat.id}`} className="scroll-mt-40">
-                <SectionHeading
-                  title={cat.name}
-                  count={commands.length}
-                  blurb={cat.description}
-                  color={cat.color}
-                />
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-                  {commands.map((cmd) => (
-                    <CommandCard
-                      key={cmd.id}
-                      cmd={cmd}
-                      category={cat}
-                      query=""
-                      isFavorite={favoriteSet.has(cmd.id)}
-                      onToggleFavorite={toggleFavorite}
-                    />
-                  ))}
-                </div>
-              </section>
-            ))}
+            {grouped.map(({ category: cat, commands }) => {
+              const Icon = CATEGORY_ICONS[cat.id];
+              return (
+                <section key={cat.id} aria-label={cat.name} id={`cat-${cat.id}`} className="scroll-mt-40">
+                  <SectionHeading
+                    icon={<Icon size={18} strokeWidth={ICON_STROKE} aria-hidden="true" />}
+                    iconColor={cat.color}
+                    title={cat.name}
+                    count={commands.length}
+                    blurb={cat.description}
+                  />
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+                    {commands.map((cmd) => (
+                      <CommandCard
+                        key={cmd.id}
+                        cmd={cmd}
+                        category={cat}
+                        query=""
+                        isFavorite={favoriteSet.has(cmd.id)}
+                        onToggleFavorite={toggleFavorite}
+                      />
+                    ))}
+                  </div>
+                </section>
+              );
+            })}
           </div>
         ) : filtered.length === 0 ? (
-          <div className="relative overflow-hidden rounded-2xl border border-dashed border-slate-300 p-10 text-center sm:p-14 dark:border-white/15">
-            <p aria-hidden="true" className="font-mono text-5xl text-slate-300 dark:text-slate-700">
-              {"~/ ∅"}
-            </p>
-            <h2 className="mt-3 text-lg font-semibold tracking-tight">No commands match</h2>
-            <p className="mx-auto mt-1 max-w-sm text-sm text-slate-500 dark:text-slate-400">
-              Try a different keyword, category, or level — e.g. “rebase”, “stash”, or “gh pr”.
+          <div
+            className="relative overflow-hidden rounded-2xl border border-dashed p-10 text-center sm:p-14"
+            style={{ borderColor: "var(--border)", backgroundColor: "var(--card)" }}
+          >
+            <div
+              className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl"
+              style={{
+                color: "var(--muted)",
+                backgroundColor: "color-mix(in srgb, var(--muted) 12%, transparent)",
+              }}
+            >
+              <SearchX size={26} strokeWidth={ICON_STROKE} aria-hidden="true" />
+            </div>
+            <h2 className="mt-4 text-lg font-semibold tracking-tight">No commands found</h2>
+            <p className="mx-auto mt-1 max-w-sm text-sm" style={{ color: "var(--muted)" }}>
+              Nothing matches {debouncedQuery ? `“${debouncedQuery}”` : "these filters"} yet. Try
+              “rebase”, “stash”, or “gh pr” — or reset everything below.
             </p>
             <button
               type="button"
@@ -308,20 +332,21 @@ export default function App() {
                 setCategory("all");
                 setDifficulty("all");
               }}
-              className="mt-5 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 px-5 py-2.5 text-sm font-medium text-white shadow-[0_8px_20px_-8px_rgba(99,102,241,0.8)] transition-all hover:brightness-110 active:scale-95"
+              className="mt-5 inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-medium text-white transition-all hover:brightness-110 active:scale-95"
+              style={{
+                background: "linear-gradient(135deg, var(--accent), var(--purple))",
+                boxShadow: "0 8px 20px -8px color-mix(in srgb, var(--accent) 70%, transparent)",
+              }}
             >
+              <RotateCcw size={15} strokeWidth={ICON_STROKE} aria-hidden="true" />
               Reset filters
             </button>
           </div>
         ) : (
           <section aria-label="Filtered commands">
             <SectionHeading
-              title={
-                debouncedQuery ? `${filtered.length} result${filtered.length === 1 ? "" : "s"}` : "Commands"
-              }
-              blurb={
-                debouncedQuery ? `Matching “${debouncedQuery}”` : "Filtered by your selection."
-              }
+              title={debouncedQuery ? `${filtered.length} result${filtered.length === 1 ? "" : "s"}` : "Commands"}
+              blurb={debouncedQuery ? `Matching “${debouncedQuery}”` : "Filtered by your selection."}
             />
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
               {filtered.map((cmd) => {
@@ -344,8 +369,9 @@ export default function App() {
 
         <section id="workflows" aria-label="Common workflows" className="mt-16 scroll-mt-40">
           <SectionHeading
+            icon={<WorkflowIcon size={18} strokeWidth={ICON_STROKE} aria-hidden="true" />}
+            iconColor="var(--purple)"
             title="Common workflows"
-            glyph="⚡"
             blurb="Step-by-step recipes for the situations developers hit every week."
           />
           <div className="grid grid-cols-1 items-start gap-4 md:grid-cols-2">
@@ -356,27 +382,40 @@ export default function App() {
         </section>
       </main>
 
-      <footer className="print-hidden mt-8 border-t border-slate-200 dark:border-white/10">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-7 text-xs text-slate-500 sm:px-6 dark:text-slate-400">
+      <footer className="print-hidden mt-8 border-t" style={{ borderColor: "var(--border)" }}>
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-7 text-xs sm:px-6" style={{ color: "var(--muted)" }}>
           <div className="flex flex-wrap items-center gap-2">
-            <span className="font-semibold text-slate-700 dark:text-slate-200">
-              GitHub Commands Cheat Sheet
-            </span>
+            <span className="font-semibold text-[var(--text)]">GitHub Commands Cheat Sheet</span>
             <span aria-hidden="true">·</span>
-            <span>Static, offline, no tracking.</span>
+            <a
+              href={REPO_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1 font-medium hover:underline"
+              style={{ color: "var(--accent)" }}
+            >
+              <ExternalLink size={12} strokeWidth={ICON_STROKE} aria-hidden="true" />
+              View on GitHub
+            </a>
           </div>
           <p className="flex items-center gap-1.5">
             Shortcuts:
-            <kbd className="rounded-md border border-slate-300 bg-white px-1.5 py-0.5 font-mono text-[11px] dark:border-white/15 dark:bg-white/5">
+            <kbd
+              className="rounded-md border px-1.5 py-0.5 font-mono text-[11px]"
+              style={{ borderColor: "var(--border)", backgroundColor: "var(--card)" }}
+            >
               /
             </kbd>
             search
-            <kbd className="rounded-md border border-slate-300 bg-white px-1.5 py-0.5 font-mono text-[11px] dark:border-white/15 dark:bg-white/5">
+            <kbd
+              className="rounded-md border px-1.5 py-0.5 font-mono text-[11px]"
+              style={{ borderColor: "var(--border)", backgroundColor: "var(--card)" }}
+            >
               Esc
             </kbd>
             clear
           </p>
-          <p className="font-mono text-[11px]">git push --set-upstream origin main</p>
+          <p>Built with Vite, React and Tailwind CSS — static, offline, no tracking.</p>
         </div>
       </footer>
     </div>
@@ -387,38 +426,42 @@ function SectionHeading({
   title,
   blurb,
   count,
-  color,
-  glyph,
+  icon,
+  iconColor,
 }: {
   title: string;
   blurb?: string;
   count?: number;
-  color?: string;
-  glyph?: string;
+  icon?: ReactNode;
+  iconColor?: string;
 }) {
   return (
     <div className="mb-4">
       <h2 className="flex items-center gap-2.5 text-xl font-bold tracking-tight">
-        {color && (
+        {icon && iconColor && (
           <span
             aria-hidden="true"
-            className="inline-block h-3 w-3 rounded-[4px]"
-            style={{ background: `linear-gradient(135deg, ${color}, ${color}88)`, boxShadow: `0 2px 10px ${color}55` }}
-          />
-        )}
-        {glyph && (
-          <span aria-hidden="true" className="text-indigo-500 dark:text-indigo-400">
-            {glyph}
+            className="inline-flex h-8 w-8 items-center justify-center rounded-[10px]"
+            style={{
+              color: iconColor,
+              backgroundColor: `color-mix(in srgb, ${iconColor} 12%, transparent)`,
+              border: `1px solid color-mix(in srgb, ${iconColor} 30%, transparent)`,
+            }}
+          >
+            {icon}
           </span>
         )}
         {title}
         {typeof count === "number" && (
-          <span className="rounded-full bg-slate-200/70 px-2 py-0.5 text-xs font-semibold text-slate-600 dark:bg-white/10 dark:text-slate-300">
+          <span
+            className="rounded-full px-2 py-0.5 text-xs font-semibold"
+            style={{ backgroundColor: "var(--hover)", color: "var(--muted)" }}
+          >
             {count}
           </span>
         )}
       </h2>
-      {blurb && <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{blurb}</p>}
+      {blurb && <p className="mt-1 text-sm" style={{ color: "var(--muted)" }}>{blurb}</p>}
     </div>
   );
 }
