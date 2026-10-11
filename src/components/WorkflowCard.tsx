@@ -7,18 +7,10 @@ export function WorkflowCard({ workflow }: { workflow: Workflow }) {
   return (
     <article
       aria-label={workflow.title}
-      className="card-enter print-card group relative flex flex-col gap-3.5 overflow-hidden rounded-2xl border bg-[var(--card)] p-5 transition-all duration-200 hover:-translate-y-0.5"
+      className="card-enter lift print-card group relative flex min-w-0 flex-col gap-3.5 overflow-hidden rounded-2xl border bg-[var(--card)] p-4 sm:p-5"
       style={{
         borderColor: "var(--border)",
         boxShadow: "0 2px 8px -2px var(--shadow-color)",
-      }}
-      onMouseEnter={(e) => {
-        (e.currentTarget as HTMLElement).style.boxShadow =
-          "0 8px 24px -8px var(--shadow-hover-amber), 0 2px 8px -2px var(--shadow-color)";
-      }}
-      onMouseLeave={(e) => {
-        (e.currentTarget as HTMLElement).style.boxShadow =
-          "0 2px 8px -2px var(--shadow-color)";
       }}
     >
       {/* Sage → amber decorative top line */}
@@ -31,12 +23,12 @@ export function WorkflowCard({ workflow }: { workflow: Workflow }) {
         }}
       />
 
-      {/* Header */}
-      <div className="flex flex-wrap items-start justify-between gap-2 pt-1">
-        <h3 className="flex items-center gap-2.5 text-base font-semibold tracking-tight text-[var(--text)]">
+      {/* Header — wraps on narrow screens instead of squeezing */}
+      <div className="flex min-w-0 flex-wrap items-start justify-between gap-2 pt-1">
+        <h3 className="fluid-section-title flex min-w-0 items-center gap-2.5 font-semibold tracking-tight text-[var(--text)]">
           <span
             aria-hidden="true"
-            className="inline-flex h-7 w-7 items-center justify-center rounded-lg"
+            className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-lg"
             style={{
               /* Sage icon on a subtle sage-tinted background */
               color: "var(--secondary)",
@@ -47,7 +39,7 @@ export function WorkflowCard({ workflow }: { workflow: Workflow }) {
           >
             <GitBranch size={15} strokeWidth={ICON_STROKE} />
           </span>
-          {workflow.title}
+          <span className="min-w-0 break-words">{workflow.title}</span>
         </h3>
         <DifficultyBadge level={workflow.difficulty} />
       </div>
@@ -58,7 +50,7 @@ export function WorkflowCard({ workflow }: { workflow: Workflow }) {
 
       {/* Numbered timeline */}
       <ol
-        className="relative mt-1 flex list-none flex-col gap-5 border-l-2 pl-0 ml-3"
+        className="relative mt-1 ml-3 flex list-none flex-col gap-5 border-l-2 pl-0"
         style={{
           /* Connecting line: sage at ~30% opacity */
           borderColor: "color-mix(in srgb, var(--secondary) 30%, transparent)",
@@ -67,7 +59,7 @@ export function WorkflowCard({ workflow }: { workflow: Workflow }) {
         {workflow.steps.map((step, i) => (
           <li
             key={`${workflow.id}-step-${i}`}
-            className="relative flex gap-3 pl-6"
+            className="relative flex min-w-0 gap-3 pl-6"
           >
             {/* Step number badge: amber → sage gradient */}
             <span
@@ -87,14 +79,14 @@ export function WorkflowCard({ workflow }: { workflow: Workflow }) {
 
             <div className="flex min-w-0 flex-1 flex-col gap-1.5">
               {/* Step title in cream */}
-              <p className="text-sm font-semibold text-[var(--text)]">
+              <p className="min-w-0 text-sm font-semibold break-words text-[var(--text)]">
                 {step.title}
               </p>
 
               {/* Command snippet styled like CommandCard code block */}
               {step.command && (
                 <code
-                  className="term-scroll block overflow-x-auto rounded-lg border px-3 py-2 font-mono text-[12px] whitespace-pre"
+                  className="term-scroll block min-w-0 overflow-x-auto rounded-lg border px-3 py-2 font-mono text-[13px] whitespace-pre"
                   style={{
                     backgroundColor: "var(--code-bg)",
                     borderColor: "var(--code-border)",

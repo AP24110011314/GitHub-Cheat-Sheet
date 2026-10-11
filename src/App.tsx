@@ -8,6 +8,7 @@ import {
   Workflow as WorkflowIcon,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { BackToTop } from "./components/BackToTop";
 import { CategoryNav, type CategoryFilter } from "./components/CategoryNav";
 import {
   CATEGORY_ICONS,
@@ -41,6 +42,31 @@ function matchesQuery(haystack: string, q: string): boolean {
   return haystack.toLowerCase().includes(q);
 }
 
+/** Small bottom toast confirming "Copied!" taps — clears the home indicator. */
+function CopyToast({ message }: { message: string | null }) {
+  return (
+    <div
+      role="status"
+      aria-live="polite"
+      aria-hidden={message === null}
+      className={`print-hidden fixed bottom-4 left-1/2 z-40 max-w-[calc(100vw-2rem)] rounded-full border px-4 py-3 font-mono text-xs font-semibold whitespace-nowrap transition-all duration-200 ${
+        message ? "mobile-toast opacity-100" : "pointer-events-none opacity-0"
+      }`}
+      style={{
+        marginBottom: "env(safe-area-inset-bottom)",
+        backgroundColor: "var(--card)",
+        borderColor: "var(--badge-beginner-border)",
+        color: "var(--badge-beginner)",
+        boxShadow: "0 8px 24px -8px var(--shadow-hover)",
+        transform: message ? "translate(-50%, 0)" : "translate(-50%, 12px)",
+        pointerEvents: message ? "auto" : "none",
+      }}
+    >
+      <span className="block max-w-[70vw] truncate">{message ?? ""}</span>
+    </div>
+  );
+}
+
 export default function App() {
   const { theme, toggle } = useTheme();
   const [query, setQuery] = useState("");
@@ -52,6 +78,22 @@ export default function App() {
   );
   const searchRef = useRef<HTMLInputElement | null>(null);
   const debouncedQuery = useDebounce(query, 150).trim().toLowerCase();
+
+  // Bottom "Copied" toast — shared by every card.
+  const [toast, setToast] = useState<string | null>(null);
+  const toastTimer = useRef<number | null>(null);
+  useEffect(() => {
+    return () => {
+      if (toastTimer.current !== null) window.clearTimeout(toastTimer.current);
+    };
+  }, []);
+  const notifyCopied = (message: string) => {
+    const short =
+      message.length > 48 ? `${message.slice(0, 48)}…` : message;
+    setToast(short);
+    if (toastTimer.current !== null) window.clearTimeout(toastTimer.current);
+    toastTimer.current = window.setTimeout(() => setToast(null), 1600);
+  };
 
   const categoriesById = useMemo(
     () => new Map(CATEGORIES.map((c) => [c.id, c])),
@@ -122,13 +164,13 @@ export default function App() {
       category: c,
       commands: COMMANDS.filter((cmd) => cmd.category === c.id),
     })).filter((g) => g.commands.length > 0);
-  }, [category, debouncedQuery, difficulty]);
+  }, [category, difficulty, debouncedQuery]);
 
   const showFavoritesView =
     category === "favorites" && !debouncedQuery && difficulty === "all";
 
   return (
-    <div className="min-h-screen bg-[var(--page)] text-[var(--text)] transition-colors">
+    <div className="min-h-dvh overflow-x-clip bg-[var(--page)] text-[var(--text)] transition-colors">
       <a
         href="#commands"
         className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded-lg focus:bg-[var(--accent)] focus:px-3 focus:py-2 focus:text-white"
@@ -137,12 +179,15 @@ export default function App() {
       </a>
 
       {/* ── Hero Header ─────────────────────────────────── */}
-      <header className="relative overflow-hidden border-b border-[var(--border)] bg-[var(--card)] text-[var(--text)] transition-colors print:bg-white print:text-black">
+      <header
+        className="relative overflow-hidden border-b border-[var(--border)] bg-[var(--card)] text-[var(--text)] transition-colors print:bg-white print:text-black"
+        style={{ paddingTop: "env(safe-area-inset-top)" }}
+      >
         <div
           aria-hidden="true"
           className="print-hidden pointer-events-none absolute inset-0 overflow-hidden"
         >
-          {/* Amber radial glow — top-left, ~8-10% opacity */}
+          {/* Amber radial glow — top-left, ~8-10% opacity (hidden on phones) */}
           <div
             className="hero-orb absolute -top-40 -left-24 h-[28rem] w-[28rem] rounded-full blur-3xl"
             style={{
@@ -150,9 +195,9 @@ export default function App() {
                 "radial-gradient(circle, color-mix(in srgb, var(--accent) 10%, transparent), transparent 70%)",
             }}
           />
-          {/* Sage radial glow — bottom-right, ~8% opacity */}
+          {/* Sage radial glow — bottom-right, ~8% opacity (hidden on phones) */}
           <div
-            className="hero-orb absolute -bottom-20 -right-16 h-80 w-80 rounded-full blur-3xl"
+            className="hero-orb absolute -right-16 -bottom-20 h-80 w-80 rounded-full blur-3xl"
             style={{
               animationDelay: "-7s",
               background:
@@ -163,22 +208,23 @@ export default function App() {
           <div className="absolute inset-0 bg-[linear-gradient(currentColor_1px,transparent_1px),linear-gradient(90deg,currentColor_1px,transparent_1px)] opacity-[0.028] bg-[size:44px_44px] [mask-image:radial-gradient(ellipse_70%_80%_at_50%_0%,black,transparent)]" />
         </div>
 
-        <div className="relative mx-auto flex max-w-6xl flex-col px-4 pt-6 pb-10 sm:px-6 sm:pt-8">
-          <div className="hero-enter flex items-center justify-between gap-3">
-            <p className="inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--page)] px-3.5 py-1.5 font-mono text-[11px] text-[var(--muted)] shadow-xs">
+        {/* 16px mobile → 24px tablet → 32px desktop, capped so lines stay short */}
+        <div className="relative mx-auto flex w-full max-w-6xl flex-col px-4 pt-6 pb-8 sm:px-6 sm:pt-8 sm:pb-10 lg:px-8 2xl:max-w-7xl">
+          <div className="hero-enter flex items-center justify-between gap-2 sm:gap-3">
+            <p className="inline-flex min-h-[44px] min-w-0 items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--page)] px-3 py-1.5 font-mono text-[11px] text-[var(--muted)] shadow-xs">
               <span
                 aria-hidden="true"
-                className="h-2 w-2 rounded-full bg-[var(--secondary)]"
+                className="h-2 w-2 shrink-0 rounded-full bg-[var(--secondary)]"
               />
-              git help --daily-reference
+              <span className="truncate">git help --daily-reference</span>
             </p>
-            <div className="flex items-center gap-2">
+            <div className="flex shrink-0 items-center gap-2">
               <ThemeToggle theme={theme} onToggle={toggle} />
               <button
                 type="button"
                 onClick={() => window.print()}
                 aria-label="Print or download as PDF"
-                className="print-hidden hidden items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--card)] px-3.5 py-2 text-xs font-semibold text-[var(--text)] shadow-xs transition-all hover:bg-[var(--hover)] active:scale-95 sm:inline-flex"
+                className="print-hidden hidden min-h-[44px] items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--card)] px-3.5 py-2 text-xs font-semibold text-[var(--text)] shadow-xs transition-all active:scale-95 sm:inline-flex"
               >
                 <Printer size={15} strokeWidth={ICON_STROKE} aria-hidden="true" />
                 Print / PDF
@@ -187,10 +233,11 @@ export default function App() {
           </div>
 
           <div
-            className="hero-enter mx-auto mt-8 flex max-w-2xl flex-col items-center text-center"
+            className="hero-enter mx-auto mt-6 flex w-full max-w-2xl flex-col items-center text-center sm:mt-8"
             style={{ animationDelay: "80ms" }}
           >
-            <h1 className="text-4xl font-extrabold tracking-tight text-balance sm:text-6xl">
+            {/* Fluid clamp() title — never overflows at 320px */}
+            <h1 className="fluid-hero-title font-extrabold tracking-tight">
               {/* Line 1: cream */}
               <span className="text-[var(--text)]">GitHub Commands</span>
               {" "}
@@ -205,7 +252,7 @@ export default function App() {
                 Cheat Sheet
               </span>
             </h1>
-            <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-[var(--muted)] sm:text-base">
+            <p className="mt-3 max-w-xl text-sm leading-relaxed text-[var(--muted)] sm:text-base">
               Every Git &amp;{" "}
               <span className="font-mono text-[13px] font-semibold text-[var(--text)]">
                 gh
@@ -232,8 +279,9 @@ export default function App() {
             />
           </div>
 
+          {/* Stat pills: 2×2 grid on phones, wrapping row on tablet+ */}
           <dl
-            className="hero-enter mx-auto mt-5 flex flex-wrap justify-center gap-2.5"
+            className="hero-enter mx-auto mt-5 grid w-full max-w-md grid-cols-2 gap-2 sm:flex sm:w-auto sm:max-w-none sm:flex-wrap sm:justify-center sm:gap-2.5"
             style={{ animationDelay: "220ms" }}
             aria-label="Cheat sheet statistics"
           >
@@ -245,7 +293,7 @@ export default function App() {
             ] as [string, string, "amber" | "sage"][]).map(([num, label, accent]) => (
               <div
                 key={label}
-                className="flex items-baseline gap-1.5 rounded-xl border bg-[var(--card)] px-3.5 py-1.5"
+                className="flex items-baseline justify-center gap-1.5 rounded-xl border bg-[var(--card)] px-3.5 py-2 sm:py-1.5"
                 style={{
                   borderColor: "var(--border)",
                   boxShadow: "0 1px 4px -1px var(--shadow-color)",
@@ -279,14 +327,14 @@ export default function App() {
 
       {/* ── Sticky Toolbar ───────────────────────────────── */}
       <div
-        className="print-hidden sticky top-0 z-20 border-b backdrop-blur-xl transition-colors"
+        className="sticky-bar print-hidden sticky top-0 z-20 border-b transition-colors"
         style={{
           borderColor: "var(--border)",
           backgroundColor:
             "color-mix(in srgb, var(--page) 88%, transparent)",
         }}
       >
-        <div className="mx-auto flex max-w-6xl flex-col gap-2.5 px-4 py-3 sm:px-6">
+        <div className="sticky-safe mx-auto flex w-full max-w-6xl flex-col gap-2 py-2 sm:gap-2.5 sm:py-3 2xl:max-w-7xl">
           <CategoryNav
             selected={category}
             onSelect={setCategory}
@@ -294,13 +342,14 @@ export default function App() {
             favoritesCount={favoriteIds.length}
             totalCount={COMMANDS.length}
           />
+          {/* Level filter: horizontal scroll rail on phones, wrap on tablet+ */}
           <div
-            className="flex flex-wrap items-center gap-1.5"
+            className="no-scrollbar -mx-1 flex items-center gap-2 overflow-x-auto px-1 py-1 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0"
             role="group"
             aria-label="Filter by difficulty"
           >
             <span
-              className="mr-1 inline-flex items-center gap-1 text-[11px] font-semibold tracking-wider uppercase text-[var(--muted)]"
+              className="inline-flex shrink-0 items-center gap-1 text-[11px] font-semibold tracking-wider uppercase text-[var(--muted)]"
             >
               <Funnel size={12} strokeWidth={ICON_STROKE} aria-hidden="true" />
               Level
@@ -312,7 +361,7 @@ export default function App() {
                   type="button"
                   onClick={() => setDifficulty(opt)}
                   aria-pressed={difficulty === opt}
-                  className="rounded-full px-3 py-1 text-xs font-semibold transition-all active:scale-95"
+                  className="min-h-[44px] shrink-0 rounded-full px-4 text-xs font-semibold transition-all active:scale-95"
                   style={
                     difficulty === opt
                       ? {
@@ -335,15 +384,20 @@ export default function App() {
                   onClick={() => setDifficulty(opt)}
                   aria-pressed={difficulty === opt}
                   aria-label={`Filter by ${opt} difficulty`}
-                  className="rounded-full p-0.5 transition-all active:scale-95"
-                  style={
-                    difficulty === opt
+                  className="shrink-0 rounded-full p-1 transition-all active:scale-95"
+                  style={{
+                    minHeight: "44px",
+                    minWidth: "44px",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    ...(difficulty === opt
                       ? {
                           outline: "2px solid var(--accent)",
                           outlineOffset: "2px",
                         }
-                      : { opacity: 0.75 }
-                  }
+                      : { opacity: 0.75 }),
+                  }}
                 >
                   <DifficultyBadge level={opt} />
                 </button>
@@ -351,7 +405,7 @@ export default function App() {
             )}
             <a
               href="#workflows"
-              className="ml-auto inline-flex items-center gap-1 text-xs font-semibold hover:underline"
+              className="ml-auto inline-flex min-h-[44px] shrink-0 items-center gap-1 px-2 text-xs font-semibold"
               style={{ color: "var(--accent-text)" }}
             >
               <WorkflowIcon
@@ -369,10 +423,10 @@ export default function App() {
       {/* ── Main Content ─────────────────────────────────── */}
       <main
         id="commands"
-        className="mx-auto max-w-6xl scroll-mt-40 px-4 py-8 sm:px-6"
+        className="mx-auto w-full max-w-6xl scroll-mt-44 px-4 py-6 sm:scroll-mt-40 sm:px-6 sm:py-8 lg:px-8 2xl:max-w-7xl"
       >
         {showFavoritesView ? (
-          <section aria-label="Favorite commands">
+          <section aria-label="Favorite commands" className="cv-section">
             <SectionHeading
               icon={
                 <Star
@@ -392,10 +446,11 @@ export default function App() {
               query={debouncedQuery}
               onToggleFavorite={toggleFavorite}
               onBrowseAll={() => setCategory("all")}
+              onCopied={notifyCopied}
             />
           </section>
         ) : grouped ? (
-          <div className="flex flex-col gap-12">
+          <div className="flex flex-col gap-10 sm:gap-12">
             {grouped.map(({ category: cat, commands }) => {
               const Icon = CATEGORY_ICONS[cat.id];
               const catPalette = CATEGORY_PALETTE[cat.id];
@@ -404,7 +459,7 @@ export default function App() {
                   key={cat.id}
                   aria-label={cat.name}
                   id={`cat-${cat.id}`}
-                  className="scroll-mt-40"
+                  className="cv-section scroll-mt-44 sm:scroll-mt-40"
                 >
                   <SectionHeading
                     icon={<Icon size={18} strokeWidth={ICON_STROKE} aria-hidden="true" />}
@@ -414,7 +469,8 @@ export default function App() {
                     count={commands.length}
                     blurb={cat.description}
                   />
-                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+                  {/* 1 col phones → 2 tablet → 3 desktop → 4 very wide */}
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
                     {commands.map((cmd) => (
                       <CommandCard
                         key={cmd.id}
@@ -423,6 +479,7 @@ export default function App() {
                         query=""
                         isFavorite={favoriteSet.has(cmd.id)}
                         onToggleFavorite={toggleFavorite}
+                        onCopied={notifyCopied}
                       />
                     ))}
                   </div>
@@ -432,7 +489,7 @@ export default function App() {
           </div>
         ) : filtered.length === 0 ? (
           <div
-            className="relative overflow-hidden rounded-2xl border border-dashed p-10 text-center sm:p-14"
+            className="relative overflow-hidden rounded-2xl border border-dashed p-6 text-center sm:p-10 lg:p-14"
             style={{
               borderColor: "var(--border)",
               backgroundColor: "var(--card)",
@@ -467,7 +524,7 @@ export default function App() {
                 setCategory("all");
                 setDifficulty("all");
               }}
-              className="mt-5 inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold transition-all hover:brightness-105 active:scale-95"
+              className="mt-5 inline-flex min-h-[44px] items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold transition-all active:scale-95"
               style={{
                 background:
                   "linear-gradient(135deg, var(--accent), var(--accent-hover))",
@@ -482,7 +539,7 @@ export default function App() {
             </button>
           </div>
         ) : (
-          <section aria-label="Filtered commands">
+          <section aria-label="Filtered commands" className="cv-section">
             <SectionHeading
               title={
                 debouncedQuery
@@ -495,7 +552,7 @@ export default function App() {
                   : "Filtered by your selection."
               }
             />
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
               {filtered.map((cmd) => {
                 const cat = categoriesById.get(cmd.category);
                 if (!cat) return null;
@@ -507,6 +564,7 @@ export default function App() {
                     query={debouncedQuery}
                     isFavorite={favoriteSet.has(cmd.id)}
                     onToggleFavorite={toggleFavorite}
+                    onCopied={notifyCopied}
                   />
                 );
               })}
@@ -518,7 +576,7 @@ export default function App() {
         <section
           id="workflows"
           aria-label="Common workflows"
-          className="mt-16 scroll-mt-40"
+          className="cv-section mt-12 scroll-mt-44 sm:mt-16 sm:scroll-mt-40"
         >
           <SectionHeading
             icon={
@@ -547,13 +605,14 @@ export default function App() {
         style={{
           borderColor: "var(--border)",
           backgroundColor: "var(--card)",
+          paddingBottom: "env(safe-area-inset-bottom)",
         }}
       >
         <div
-          className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-8 text-xs sm:px-6"
+          className="mx-auto flex w-full max-w-6xl flex-col items-start gap-3 px-4 py-6 text-xs sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:px-6 sm:py-8 lg:px-8 2xl:max-w-7xl"
           style={{ color: "var(--muted)" }}
         >
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex min-w-0 flex-wrap items-center gap-2">
             <span className="font-semibold text-[var(--text)]">
               GitHub Commands Cheat Sheet
             </span>
@@ -562,7 +621,7 @@ export default function App() {
               href={REPO_URL}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-1 font-semibold hover:underline"
+              className="inline-flex min-h-[44px] items-center gap-1 font-semibold"
               style={{ color: "var(--accent-text)" }}
             >
               <ExternalLink
@@ -573,7 +632,8 @@ export default function App() {
               View on GitHub
             </a>
           </div>
-          <p className="flex items-center gap-1.5">
+          {/* Keyboard-shortcut legend is meaningless on touch — hide on coarse pointers */}
+          <p className="kbd-hint hidden items-center gap-1.5 sm:flex">
             Shortcuts:
             <kbd
               className="rounded-md border px-1.5 py-0.5 font-mono text-[11px]"
@@ -604,6 +664,9 @@ export default function App() {
           </p>
         </div>
       </footer>
+
+      <BackToTop />
+      <CopyToast message={toast} />
     </div>
   );
 }
@@ -623,11 +686,11 @@ function SectionHeading({
 }) {
   return (
     <div className="mb-4">
-      <h2 className="flex items-center gap-2.5 text-xl font-bold tracking-tight text-[var(--text)]">
+      <h2 className="fluid-section-title flex min-w-0 flex-wrap items-center gap-2.5 font-bold tracking-tight text-[var(--text)]">
         {icon && iconColor && (
           <span
             aria-hidden="true"
-            className="inline-flex h-8 w-8 items-center justify-center rounded-[10px]"
+            className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px]"
             style={{
               color: iconColor,
               backgroundColor: `color-mix(in srgb, ${iconColor} 14%, transparent)`,
@@ -637,7 +700,7 @@ function SectionHeading({
             {icon}
           </span>
         )}
-        {title}
+        <span className="min-w-0 break-words">{title}</span>
         {typeof count === "number" && (
           <span
             className="rounded-full px-2 py-0.5 text-xs font-semibold"
@@ -655,7 +718,7 @@ function SectionHeading({
         )}
       </h2>
       {blurb && (
-        <p className="mt-1 text-sm text-[var(--muted)]">
+        <p className="mt-1 max-w-2xl text-sm text-[var(--muted)]">
           {blurb}
         </p>
       )}

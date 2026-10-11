@@ -9,6 +9,7 @@ interface FavoritesViewProps {
   query: string;
   onToggleFavorite: (id: string) => void;
   onBrowseAll: () => void;
+  onCopied?: (message: string) => void;
 }
 
 export function FavoritesView({
@@ -17,11 +18,12 @@ export function FavoritesView({
   query,
   onToggleFavorite,
   onBrowseAll,
+  onCopied,
 }: FavoritesViewProps) {
   if (favorites.length === 0) {
     return (
       <div
-        className="relative overflow-hidden rounded-2xl border border-dashed p-10 text-center sm:p-14"
+        className="relative overflow-hidden rounded-2xl border border-dashed p-6 text-center sm:p-10 lg:p-14"
         style={{
           borderColor: "var(--border)",
           backgroundColor: "var(--card)",
@@ -30,7 +32,7 @@ export function FavoritesView({
       >
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute -top-20 left-1/2 h-44 w-80 -translate-x-1/2 rounded-full blur-3xl opacity-35"
+          className="pointer-events-none absolute -top-20 left-1/2 h-44 w-80 max-w-full -translate-x-1/2 rounded-full blur-3xl opacity-35"
           style={{ background: "var(--accent)" }}
         />
         <div
@@ -51,7 +53,7 @@ export function FavoritesView({
         <button
           type="button"
           onClick={onBrowseAll}
-          className="relative mt-5 inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white transition-all hover:brightness-105 active:scale-95"
+          className="relative mt-5 inline-flex min-h-[44px] items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white transition-all active:scale-95"
           style={{
             background: "linear-gradient(135deg, var(--accent), var(--accent-hover))",
             boxShadow: "0 4px 14px -2px color-mix(in srgb, var(--accent) 55%, transparent)",
@@ -64,7 +66,7 @@ export function FavoritesView({
   }
 
   return (
-    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
       {favorites.map((cmd) => {
         const category = categoriesById.get(cmd.category);
         if (!category) return null;
@@ -76,6 +78,7 @@ export function FavoritesView({
             query={query}
             isFavorite
             onToggleFavorite={onToggleFavorite}
+            onCopied={onCopied}
           />
         );
       })}

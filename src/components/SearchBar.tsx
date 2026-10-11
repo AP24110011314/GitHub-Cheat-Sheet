@@ -20,7 +20,7 @@ export function SearchBar({
   totalCount,
 }: SearchBarProps) {
   return (
-    <div role="search" className="w-full">
+    <div role="search" className="print-hidden w-full">
       <label htmlFor="command-search" className="sr-only">
         Search commands
       </label>
@@ -37,11 +37,13 @@ export function SearchBar({
           type="search"
           autoComplete="off"
           spellCheck={false}
+          enterKeyHint="search"
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          placeholder="Search commands… try “rebase”, “stash”, “gh pr”"
+          placeholder="Search commands… try “rebase”"
           aria-describedby="search-count"
-          className="h-13 w-full rounded-2xl border py-3.5 pr-28 pl-11 text-[15px] outline-none transition-all placeholder:text-[var(--muted)]"
+          // 16px font prevents iOS auto-zoom on focus; 52px+ height = comfy touch target.
+          className="h-[52px] w-full rounded-2xl border py-3.5 pr-24 pl-11 text-base outline-none transition-all placeholder:text-[var(--muted)] sm:pr-28 sm:text-[15px]"
           style={{
             backgroundColor: "var(--card)",
             borderColor: "var(--border)",
@@ -59,23 +61,25 @@ export function SearchBar({
               "0 4px 16px -4px var(--shadow-color)";
           }}
         />
-        <div className="absolute top-1/2 right-3 flex -translate-y-1/2 items-center gap-1.5">
+        <div className="absolute top-1/2 right-2 flex -translate-y-1/2 items-center gap-1.5">
           {value && (
             <button
               type="button"
               onClick={onClear}
               aria-label="Clear search"
-              className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-medium transition-colors hover:bg-[var(--hover)]"
+              className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center gap-1 rounded-lg px-3 text-xs font-medium transition-colors active:scale-95"
               style={{ color: "var(--muted)" }}
             >
-              <X size={13} strokeWidth={ICON_STROKE} aria-hidden="true" />
+              <X size={14} strokeWidth={ICON_STROKE} aria-hidden="true" />
               Clear
             </button>
           )}
+          {/* Hidden on touch devices via .kbd-hint CSS (hover:none / pointer:coarse),
+              and below sm regardless — it only makes sense with a physical keyboard. */}
           <kbd
             aria-hidden="true"
             title="Press / to focus search"
-            className="hidden rounded-lg border px-2 py-1 font-mono text-[11px] font-semibold sm:inline"
+            className="kbd-hint hidden rounded-lg border px-2 py-1 font-mono text-[11px] font-semibold sm:inline"
             style={{
               borderColor: "var(--border)",
               color: "var(--muted)",

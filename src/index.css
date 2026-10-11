@@ -122,9 +122,11 @@
   color-scheme: dark;
 }
 
-/* ── Global resets ──────────────────────────────────────────────────── */
+/* ── Responsive foundation ─────────────────────────────────────────── */
 html {
   scroll-behavior: smooth;
+  /* Never allow sideways page scroll — inner code blocks scroll instead */
+  overflow-x: clip;
 }
 
 body {
@@ -133,15 +135,34 @@ body {
   color: var(--text);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  /* Belt and suspenders against horizontal scroll from 320px up */
+  overflow-x: clip;
+  max-width: 100%;
   transition:
     background-color 0.30s ease,
     color 0.30s ease;
 }
 
-@media (prefers-reduced-motion: reduce) {
+/* Notched phones: keep the page background under the home indicator */
+@supports (padding: env(safe-area-inset-bottom)) {
   body {
-    transition: none;
+    padding-bottom: env(safe-area-inset-bottom);
   }
+}
+
+/* Fluid type — hero + section headings scale without overflowing at 320px */
+.fluid-hero-title {
+  font-size: clamp(2rem, 1.35rem + 3.25vw, 3.75rem);
+  line-height: 1.06;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+  overflow-wrap: break-word;
+}
+
+.fluid-section-title {
+  font-size: clamp(1.125rem, 1rem + 1.2vw, 1.25rem);
+  line-height: 1.3;
+  overflow-wrap: break-word;
 }
 
 ::selection {
@@ -164,7 +185,96 @@ mark.search-match {
   padding: 0 2px;
 }
 
-/* ── Motion & Micro-animations ───────────────────────────────────── */
+/* ── Touch foundation ──────────────────────────────────────────────── */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+a,
+button,
+input,
+select,
+[role="button"] {
+  /* Remove 300ms tap delay on mobile browsers */
+  touch-action: manipulation;
+}
+
+/* Touch-friendly lift: hover styles only where a hover pointer exists,
+   pressed state everywhere. Replaces bare `hover:-translate-y-*` classes. */
+.lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+@media (hover: hover) {
+  .lift:hover {
+    transform: translateY(-2px);
+  }
+}
+.lift:active {
+  transform: translateY(0) scale(0.99);
+}
+
+/* Hide the "/" kbd shortcut hint on touch devices (coarse pointers,
+   no hover) — it is meaningless without a physical keyboard. */
+@media (hover: none), (pointer: coarse) {
+  .kbd-hint {
+    display: none !important;
+  }
+}
+
+/* ── Scrollable tab rail ───────────────────────────────────────────── */
+.tab-rail {
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+}
+.tab-rail > * {
+  scroll-snap-align: center;
+}
+
+/* Edge fade gradients show the rail scrolls (fades use page surface). */
+.rail-fade {
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2rem;
+  z-index: 1;
+}
+.rail-fade-left {
+  left: 0;
+  background: linear-gradient(to right, var(--page), transparent);
+}
+.rail-fade-right {
+  right: 0;
+  background: linear-gradient(to left, var(--page), transparent);
+}
+
+/* ── Sticky toolbar + safe areas ───────────────────────────────────── */
+.sticky-bar {
+  /* Blend page surface so content sliding under stays legible */
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+}
+.sticky-safe {
+  padding-left: max(1rem, env(safe-area-inset-left));
+  padding-right: max(1rem, env(safe-area-inset-right));
+}
+
+/* Landscape phones / short viewports: a sticky bar taller than ~20% of
+   the viewport eats the screen — let it scroll away instead. */
+@media (max-height: 500px) {
+  .sticky-bar {
+    position: static !important;
+  }
+}
+
+/* ── Performance: cheap scrolling for 144 cards ────────────────────── */
+.cv-section {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 900px;
+}
+
+/* ── Motion & Micro-animations (transform + opacity only) ──────────── */
 @keyframes rise {
   from {
     opacity: 0;
@@ -207,6 +317,17 @@ mark.search-match {
   }
 }
 
+@keyframes toast-up {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 12px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
 .card-enter {
   animation: rise 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
@@ -223,15 +344,51 @@ mark.search-match {
   animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
+.mobile-toast {
+  animation: toast-up 0.25s ease-out both;
+}
+
 @media (prefers-reduced-motion: reduce) {
+  body {
+    transition: none;
+  }
   .card-enter,
   .hero-enter,
   .hero-orb,
-  .star-pop {
+  .star-pop,
+  .mobile-toast {
     animation: none;
   }
   html {
     scroll-behavior: auto;
+  }
+  .lift,
+  .lift:hover,
+  .lift:active {
+    transform: none;
+  }
+}
+
+/* Small screens: kill heavy glows / blurs / backdrop filters that
+   jank low-end phones. Orbs off, sticky bar goes solid. */
+@media (max-width: 639px) {
+  .hero-orb {
+    display: none;
+  }
+  .sticky-bar {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+/* Respect system contrast + theme preferences without changing palette */
+@media (prefers-contrast: more) {
+  :where(a, button, input, [tabindex]):focus-visible {
+    outline-width: 3px;
+  }
+  .card-enter,
+  .print-card {
+    border-width: 2px;
   }
 }
 
@@ -248,8 +405,10 @@ mark.search-match {
   border-radius: 999px;
   transition: background 0.2s ease;
 }
-.term-scroll::-webkit-scrollbar-thumb:hover {
-  background: var(--accent);
+@media (hover: hover) {
+  .term-scroll::-webkit-scrollbar-thumb:hover {
+    background: var(--accent);
+  }
 }
 
 /* Page-level scrollbar in dark mode: sage thumb, amber on hover */
@@ -263,11 +422,13 @@ mark.search-match {
   background: color-mix(in srgb, var(--secondary) 45%, transparent);
   border-radius: 999px;
 }
-.dark ::-webkit-scrollbar-thumb:hover {
-  background: var(--accent);
+@media (hover: hover) {
+  .dark ::-webkit-scrollbar-thumb:hover {
+    background: var(--accent);
+  }
 }
 
-/* Hide scrollbars on mobile category rail */
+/* Hide scrollbars on mobile rails while keeping swipe scrolling */
 .no-scrollbar {
   scrollbar-width: none;
 }
@@ -296,6 +457,7 @@ mark.search-match {
     background: #ffffff !important;
     color: #111111 !important;
     font-size: 11px;
+    padding-bottom: 0;
   }
   .print-card {
     break-inside: avoid;
@@ -305,5 +467,8 @@ mark.search-match {
   }
   main {
     max-width: 100% !important;
+  }
+  .cv-section {
+    content-visibility: visible;
   }
 }

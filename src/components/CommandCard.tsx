@@ -11,6 +11,16 @@ interface CommandCardProps {
   query: string;
   isFavorite: boolean;
   onToggleFavorite: (id: string) => void;
+  /** Called after a successful copy — App shows a bottom toast on touch devices. */
+  onCopied?: (message: string) => void;
+}
+
+function canHover(): boolean {
+  return (
+    typeof window !== "undefined" &&
+    typeof window.matchMedia === "function" &&
+    window.matchMedia("(hover: hover)").matches
+  );
 }
 
 async function copyText(text: string): Promise<boolean> {
@@ -18,13 +28,17 @@ async function copyText(text: string): Promise<boolean> {
     await navigator.clipboard.writeText(text);
     return true;
   } catch {
+    // Fallback for non-secure contexts / older browsers (http, in-app webviews).
     try {
       const ta = document.createElement("textarea");
       ta.value = text;
       ta.setAttribute("readonly", "");
-      ta.style.position = "absolute";
+      ta.style.position = "fixed";
+      ta.style.top = "0";
       ta.style.left = "-9999px";
+      ta.style.opacity = "0";
       document.body.appendChild(ta);
+      ta.focus();
       ta.select();
       const ok = document.execCommand("copy");
       document.body.removeChild(ta);
@@ -118,6 +132,7 @@ export function CommandCard({
   query,
   isFavorite,
   onToggleFavorite,
+  onCopied,
 }: CommandCardProps) {
   const [copied, setCopied] = useState(false);
   const timer = useRef<number | null>(null);
@@ -132,6 +147,7 @@ export function CommandCard({
     const ok = await copyText(cmd.command);
     if (ok) {
       setCopied(true);
+      onCopied?.(`Copied: ${cmd.command}`);
       if (timer.current !== null) window.clearTimeout(timer.current);
       timer.current = window.setTimeout(() => setCopied(false), 1600);
     }
@@ -146,10 +162,27 @@ export function CommandCard({
    */
   const isDestructive = Boolean(cmd.careful);
 
+  // Hover glow only where hover exists — touch taps skip straight to :active.
+  const applyHover = (el: HTMLElement) => {
+    if (!canHover()) return;
+    el.style.boxShadow =
+      "0 8px 24px -8px var(--shadow-hover-amber), 0 2px 8px -2px var(--shadow-color)";
+    el.style.borderColor = isDestructive
+      ? "var(--destructive)"
+      : "color-mix(in srgb, var(--accent) 50%, var(--border))";
+  };
+  const clearHover = (el: HTMLElement) => {
+    if (!canHover()) return;
+    el.style.boxShadow = "0 2px 8px -2px var(--shadow-color)";
+    el.style.borderColor = isDestructive
+      ? "var(--destructive-border)"
+      : "var(--border)";
+  };
+
   return (
     <article
       aria-label={cmd.command}
-      className="card-enter print-card group flex flex-col overflow-hidden rounded-2xl border bg-[var(--card)] transition-all duration-200 hover:-translate-y-0.5"
+      className="card-enter lift print-card group flex min-w-0 flex-col overflow-hidden rounded-2xl border bg-[var(--card)]"
       style={{
         borderColor: isDestructive
           ? "var(--destructive-border)"
@@ -159,20 +192,8 @@ export function CommandCard({
         borderLeftWidth: isDestructive ? "3px" : "1px",
         borderLeftColor: isDestructive ? "var(--destructive)" : "var(--border)",
       }}
-      onMouseEnter={(e) => {
-        (e.currentTarget as HTMLElement).style.boxShadow =
-          "0 8px 24px -8px var(--shadow-hover-amber), 0 2px 8px -2px var(--shadow-color)";
-        (e.currentTarget as HTMLElement).style.borderColor = isDestructive
-          ? "var(--destructive)"
-          : "color-mix(in srgb, var(--accent) 50%, var(--border))";
-      }}
-      onMouseLeave={(e) => {
-        (e.currentTarget as HTMLElement).style.boxShadow =
-          "0 2px 8px -2px var(--shadow-color)";
-        (e.currentTarget as HTMLElement).style.borderColor = isDestructive
-          ? "var(--destructive-border)"
-          : "var(--border)";
-      }}
+      onMouseEnter={(e) => applyHover(e.currentTarget as HTMLElement)}
+      onMouseLeave={(e) => clearHover(e.currentTarget as HTMLElement)}
     >
       {/* Top accent bar: sage → amber gradient */}
       <div
@@ -183,13 +204,13 @@ export function CommandCard({
         }}
       />
 
-      <div className="flex flex-1 flex-col gap-3 p-4">
-        {/* Category label + difficulty badge */}
-        <div className="flex items-center justify-between gap-2">
-          <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold tracking-wider uppercase">
+      <div className="flex min-w-0 flex-1 flex-col gap-3 p-4">
+        {/* Category label + difficulty badge — wraps instead of squeezing */}
+        <div className="flex min-w-0 flex-wrap items-center justify-between gap-x-2 gap-y-1.5">
+          <span className="inline-flex min-w-0 items-center gap-1.5 text-[11px] font-semibold tracking-wider uppercase">
             <span
               aria-hidden="true"
-              className="inline-flex h-5 w-5 items-center justify-center rounded-md"
+              className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md"
               style={{
                 /* Icon chip: sage-to-amber low-opacity gradient background, sage icon */
                 color: catPalette.dark,
@@ -199,14 +220,14 @@ export function CommandCard({
             >
               <CategoryIcon size={13} strokeWidth={ICON_STROKE} />
             </span>
-            <span className="text-[var(--muted)]">{category.name}</span>
+            <span className="truncate text-[var(--muted)]">{category.name}</span>
           </span>
           <DifficultyBadge level={cmd.difficulty} />
         </div>
 
-        {/* Code block */}
+        {/* Code block — scrolls internally, never breaks the card */}
         <div
-          className="overflow-hidden rounded-xl border transition-colors"
+          className="min-w-0 overflow-hidden rounded-xl border transition-colors"
           style={{
             backgroundColor: "var(--code-bg)",
             borderColor: "var(--code-border)",
@@ -219,17 +240,17 @@ export function CommandCard({
           >
             <span
               aria-hidden="true"
-              className="h-2 w-2 rounded-full"
+              className="h-2 w-2 shrink-0 rounded-full"
               style={{ backgroundColor: "var(--text)" }}  /* cream */
             />
             <span
               aria-hidden="true"
-              className="h-2 w-2 rounded-full"
+              className="h-2 w-2 shrink-0 rounded-full"
               style={{ backgroundColor: "var(--accent)" }} /* amber */
             />
             <span
               aria-hidden="true"
-              className="h-2 w-2 rounded-full"
+              className="h-2 w-2 shrink-0 rounded-full"
               style={{ backgroundColor: "var(--secondary)" }} /* sage */
             />
             <span
@@ -239,14 +260,15 @@ export function CommandCard({
               bash
             </span>
 
-            {/* Copy button: amber outline → solid amber on hover → sage on success */}
+            {/* Copy button: 44px target, amber outline → solid amber on hover → sage on success */}
             <button
               type="button"
               onClick={handleCopy}
               aria-label={
                 copied ? `Copied ${cmd.command}` : `Copy ${cmd.command}`
               }
-              className="print-hidden ml-auto inline-flex items-center gap-1 rounded-md border px-2 py-0.5 font-mono text-[11px] font-semibold transition-all duration-150 active:scale-95"
+              aria-live="polite"
+              className="print-hidden ml-auto inline-flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center gap-1 rounded-md border px-3 font-mono text-[11px] font-semibold transition-all duration-150 active:scale-95"
               style={
                 copied
                   ? {
@@ -272,7 +294,7 @@ export function CommandCard({
             </button>
           </div>
 
-          {/* Command line */}
+          {/* Command line — internal horizontal scroll, thin scrollbar */}
           <code className="term-scroll block overflow-x-auto px-3.5 py-3 font-mono text-[13px] leading-relaxed whitespace-pre">
             {/* $ prompt in sage */}
             <span
@@ -286,21 +308,21 @@ export function CommandCard({
           </code>
         </div>
 
-        {/* Description */}
+        {/* Description — 14px minimum body text */}
         <p className="text-sm leading-relaxed text-[var(--muted)]">
           <Highlight text={cmd.description} query={query} />
         </p>
 
-        {/* Example */}
+        {/* Example — wraps long URLs instead of overflowing */}
         <p
-          className="rounded-lg border px-3 py-1.5 text-xs"
+          className="min-w-0 rounded-lg border px-3 py-1.5 text-xs"
           style={{
             borderColor: "var(--border-subtle)",
             backgroundColor: "color-mix(in srgb, var(--raised) 60%, transparent)",
           }}
         >
           <span className="font-semibold text-[var(--text)]">Example · </span>
-          <code className="font-mono text-[12px] break-all text-[var(--muted)]">
+          <code className="font-mono text-[12px] break-words text-[var(--muted)]">
             <Highlight text={cmd.example} query={query} />
           </code>
         </p>
@@ -309,7 +331,7 @@ export function CommandCard({
         {cmd.careful && (
           <p
             role="note"
-            className="flex gap-2 rounded-lg border px-3 py-2 text-xs leading-relaxed"
+            className="flex min-w-0 gap-2 rounded-lg border px-3 py-2 text-xs leading-relaxed"
             style={{
               color: "var(--destructive)",
               borderColor: "var(--destructive-border)",
@@ -322,14 +344,14 @@ export function CommandCard({
               aria-hidden="true"
               className="mt-0.5 shrink-0"
             />
-            <span>
+            <span className="min-w-0">
               <strong>Careful — </strong>
               {cmd.careful}
             </span>
           </p>
         )}
 
-        {/* Favorite star */}
+        {/* Favorite star — 44px target */}
         <div className="print-hidden mt-auto flex items-center pt-1">
           <button
             type="button"
@@ -340,7 +362,7 @@ export function CommandCard({
                 ? `Remove ${cmd.command} from favorites`
                 : `Add ${cmd.command} to favorites`
             }
-            className="inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-semibold transition-all duration-150 active:scale-95"
+            className="inline-flex min-h-[44px] items-center gap-1.5 rounded-lg border px-3.5 text-xs font-semibold transition-all duration-150 active:scale-95"
             style={
               isFavorite
                 ? {

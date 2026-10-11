@@ -15,7 +15,7 @@ export function ThemeToggle({ theme, onToggle }: ThemeToggleProps) {
       onClick={onToggle}
       aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
       aria-pressed={dark}
-      className="print-hidden inline-flex items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--card)] px-3.5 py-2 text-xs font-semibold text-[var(--text)] shadow-sm transition-all duration-300 hover:bg-[var(--raised)] hover:border-[var(--accent)] active:scale-95"
+      className="print-hidden inline-flex min-h-[44px] items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--card)] px-3.5 py-2 text-xs font-semibold text-[var(--text)] shadow-sm transition-all duration-300 active:scale-95"
       style={{
         /* Smooth 300ms transition between modes — skipped when prefers-reduced-motion */
         transition:
