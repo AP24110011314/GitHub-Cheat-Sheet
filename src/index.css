@@ -11,9 +11,10 @@
 
 /* ── Warm Earthy Brand Palette ─────────────────────────────────────── */
 :root {
-  /* Light mode: Warm Cream + Sage */
+  /* Light mode: Warm Cream + Sage — UNCHANGED */
   --page: #FCF9EA;
   --card: #FFFDF5;
+  --raised: #F5F1E0;
   --accent: #DB9558;
   --accent-hover: #C98246;
   --accent-text: #964F17;
@@ -52,60 +53,76 @@
   /* Shadows and search highlight */
   --shadow-color: rgba(59, 42, 26, 0.08);
   --shadow-hover: rgba(59, 42, 26, 0.16);
+  --shadow-hover-amber: rgba(219, 149, 88, 0.12);
   --mark-bg: rgba(219, 149, 88, 0.35);
   --mark-text: #2A1A0E;
 
   color-scheme: light;
 }
 
+/* ── Forest Sage Dark Mode ──────────────────────────────────────────── */
 .dark {
-  /* Dark mode: Deep Brown + Amber */
-  --page: #2A1A0E;
-  --card: #3A2616;
-  --accent: #F4AE52;
-  --accent-hover: #F8BC6D;
-  --accent-text: #F4AE52;
-  --secondary: #D4621A;
-  --secondary-text: #F88942;
-  --border: #4A3220;
-  --border-subtle: rgba(74, 50, 32, 0.7);
-  --hover: rgba(254, 243, 226, 0.08);
-  --text: #FEF3E2;
-  --muted: rgba(254, 243, 226, 0.65);
+  /* Foundations */
+  --page: #12170F;
+  --card: #1D261A;
+  --raised: #26331F;
 
-  /* Badges & Destructive semantics */
-  --badge-beginner: #A5BF8B;
-  --badge-beginner-bg: rgba(151, 168, 122, 0.20);
-  --badge-beginner-border: rgba(151, 168, 122, 0.45);
-  --badge-intermediate: #F4AE52;
-  --badge-intermediate-bg: rgba(244, 174, 82, 0.20);
-  --badge-intermediate-border: rgba(244, 174, 82, 0.45);
-  --badge-advanced: #E87228;
-  --badge-advanced-bg: rgba(212, 98, 26, 0.22);
-  --badge-advanced-border: rgba(212, 98, 26, 0.50);
+  /* Typography */
+  --text: #FCF9EA;
+  --muted: rgba(252, 249, 234, 0.65);
 
-  --destructive: #D4621A;
-  --destructive-bg: rgba(212, 98, 26, 0.20);
-  --destructive-border: rgba(212, 98, 26, 0.55);
+  /* Accent roles: amber = interactive, sage = informational */
+  --accent: #DB9558;
+  --accent-hover: #F0B982;
+  --accent-text: #DB9558;
+  --secondary: #97A87A;
+  --secondary-text: #97A87A;
+
+  /* Borders */
+  --border: #3A4A35;
+  --border-subtle: rgba(58, 74, 53, 0.60);
+
+  /* Hover / raised surface */
+  --hover: rgba(38, 51, 31, 0.90);
+
+  /* Difficulty badges */
+  --badge-beginner: #97A87A;
+  --badge-beginner-bg: rgba(151, 168, 122, 0.15);
+  --badge-beginner-border: rgba(151, 168, 122, 0.40);
+  --badge-intermediate: #DB9558;
+  --badge-intermediate-bg: rgba(219, 149, 88, 0.15);
+  --badge-intermediate-border: rgba(219, 149, 88, 0.40);
+  --badge-advanced: #B8743A;
+  --badge-advanced-bg: rgba(184, 116, 58, 0.18);
+  --badge-advanced-border: rgba(184, 116, 58, 0.45);
+
+  /* Destructive — amber-brown only, no red */
+  --destructive: #B8743A;
+  --destructive-bg: rgba(184, 116, 58, 0.15);
+  --destructive-border: rgba(184, 116, 58, 0.45);
 
   /* Code block tokens */
-  --code-bg: #1F1309;
-  --code-border: #4A3220;
-  --code-text: #FEF3E2;
-  --code-cmd: #F4AE52;
-  --code-flag: rgba(254, 243, 226, 0.65);
-  --code-str: #A5BF8B;
-  --code-prompt: #F4AE52;
+  --code-bg: #0D110A;
+  --code-border: #3A4A35;
+  --code-text: #FCF9EA;
+  --code-cmd: #DB9558;
+  --code-flag: rgba(252, 249, 234, 0.60);
+  --code-str: #A8BBA3;
+  --code-prompt: #97A87A;
 
-  /* Shadows and search highlight */
-  --shadow-color: rgba(0, 0, 0, 0.4);
-  --shadow-hover: rgba(0, 0, 0, 0.65);
-  --mark-bg: rgba(244, 174, 82, 0.35);
-  --mark-text: #FEF3E2;
+  /* Shadows */
+  --shadow-color: rgba(0, 0, 0, 0.50);
+  --shadow-hover: rgba(0, 0, 0, 0.70);
+  --shadow-hover-amber: rgba(219, 149, 88, 0.18);
+
+  /* Search highlight */
+  --mark-bg: rgba(219, 149, 88, 0.30);
+  --mark-text: #FCF9EA;
 
   color-scheme: dark;
 }
 
+/* ── Global resets ──────────────────────────────────────────────────── */
 html {
   scroll-behavior: smooth;
 }
@@ -117,8 +134,14 @@ body {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   transition:
-    background-color 0.25s ease,
-    color 0.25s ease;
+    background-color 0.30s ease,
+    color 0.30s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body {
+    transition: none;
+  }
 }
 
 ::selection {
@@ -126,7 +149,7 @@ body {
   color: var(--text);
 }
 
-/* Visible, consistent focus states for keyboard users */
+/* Focus rings — amber in both modes */
 :where(a, button, input, select, [tabindex]):focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
@@ -210,12 +233,9 @@ mark.search-match {
   html {
     scroll-behavior: auto;
   }
-  body {
-    transition: none;
-  }
 }
 
-/* Custom scrollbars inside terminal code blocks */
+/* ── Scrollbars ──────────────────────────────────────────────────── */
 .term-scroll {
   scrollbar-width: thin;
   scrollbar-color: var(--border) transparent;
@@ -226,14 +246,45 @@ mark.search-match {
 .term-scroll::-webkit-scrollbar-thumb {
   background: var(--border);
   border-radius: 999px;
+  transition: background 0.2s ease;
+}
+.term-scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
 }
 
-/* Hide scrollbars on the mobile category rail, keep scrolling */
+/* Page-level scrollbar in dark mode: sage thumb, amber on hover */
+.dark ::-webkit-scrollbar {
+  width: 8px;
+}
+.dark ::-webkit-scrollbar-track {
+  background: var(--page);
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--secondary) 45%, transparent);
+  border-radius: 999px;
+}
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
+}
+
+/* Hide scrollbars on mobile category rail */
 .no-scrollbar {
   scrollbar-width: none;
 }
 .no-scrollbar::-webkit-scrollbar {
   display: none;
+}
+
+/* ── Gradient divider utility ────────────────────────────────────── */
+.divider-gradient {
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    var(--border),
+    transparent
+  );
+  border: none;
 }
 
 /* ── Print / PDF Styles ──────────────────────────────────────────── */

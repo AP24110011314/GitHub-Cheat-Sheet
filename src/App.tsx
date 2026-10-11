@@ -142,12 +142,25 @@ export default function App() {
           aria-hidden="true"
           className="print-hidden pointer-events-none absolute inset-0 overflow-hidden"
         >
-          <div className="hero-orb absolute -top-32 -left-20 h-96 w-96 rounded-full bg-[var(--accent)]/15 blur-3xl" />
+          {/* Amber radial glow — top-left, ~8-10% opacity */}
           <div
-            className="hero-orb absolute -top-20 right-0 h-80 w-80 rounded-full bg-[var(--secondary)]/15 blur-3xl"
-            style={{ animationDelay: "-7s" }}
+            className="hero-orb absolute -top-40 -left-24 h-[28rem] w-[28rem] rounded-full blur-3xl"
+            style={{
+              background:
+                "radial-gradient(circle, color-mix(in srgb, var(--accent) 10%, transparent), transparent 70%)",
+            }}
           />
-          <div className="absolute inset-0 bg-[linear-gradient(currentColor_1px,transparent_1px),linear-gradient(90deg,currentColor_1px,transparent_1px)] opacity-[0.035] bg-[size:44px_44px] [mask-image:radial-gradient(ellipse_70%_80%_at_50%_0%,black,transparent)]" />
+          {/* Sage radial glow — bottom-right, ~8% opacity */}
+          <div
+            className="hero-orb absolute -bottom-20 -right-16 h-80 w-80 rounded-full blur-3xl"
+            style={{
+              animationDelay: "-7s",
+              background:
+                "radial-gradient(circle, color-mix(in srgb, var(--secondary) 8%, transparent), transparent 70%)",
+            }}
+          />
+          {/* Subtle dot-grid texture */}
+          <div className="absolute inset-0 bg-[linear-gradient(currentColor_1px,transparent_1px),linear-gradient(90deg,currentColor_1px,transparent_1px)] opacity-[0.028] bg-[size:44px_44px] [mask-image:radial-gradient(ellipse_70%_80%_at_50%_0%,black,transparent)]" />
         </div>
 
         <div className="relative mx-auto flex max-w-6xl flex-col px-4 pt-6 pb-10 sm:px-6 sm:pt-8">
@@ -177,9 +190,18 @@ export default function App() {
             className="hero-enter mx-auto mt-8 flex max-w-2xl flex-col items-center text-center"
             style={{ animationDelay: "80ms" }}
           >
-            <h1 className="text-4xl font-extrabold tracking-tight text-balance sm:text-6xl text-[var(--text)]">
-              GitHub Commands{" "}
-              <span className="bg-gradient-to-r from-[var(--accent)] via-[var(--accent-hover)] to-[var(--secondary)] bg-clip-text text-transparent">
+            <h1 className="text-4xl font-extrabold tracking-tight text-balance sm:text-6xl">
+              {/* Line 1: cream */}
+              <span className="text-[var(--text)]">GitHub Commands</span>
+              {" "}
+              {/* Line 2: amber → lighter amber → sage gradient */}
+              <span
+                className="bg-clip-text text-transparent"
+                style={{
+                  backgroundImage:
+                    "linear-gradient(90deg, var(--accent), var(--accent-hover) 55%, var(--secondary))",
+                }}
+              >
                 Cheat Sheet
               </span>
             </h1>
@@ -215,20 +237,31 @@ export default function App() {
             style={{ animationDelay: "220ms" }}
             aria-label="Cheat sheet statistics"
           >
-            {[
-              [`${COMMANDS.length}`, "commands"],
-              [`${CATEGORIES.length}`, "categories"],
-              [`${WORKFLOWS.length}`, "workflows"],
-              ["100%", "offline"],
-            ].map(([num, label]) => (
+            {([
+              [`${COMMANDS.length}`, "commands", "amber"],
+              [`${CATEGORIES.length}`, "categories", "sage"],
+              [`${WORKFLOWS.length}`, "workflows", "amber"],
+              ["100%", "offline", "sage"],
+            ] as [string, string, "amber" | "sage"][]).map(([num, label, accent]) => (
               <div
                 key={label}
-                className="flex items-baseline gap-1.5 rounded-xl border border-[var(--border)] bg-[var(--page)] px-3.5 py-1.5 shadow-xs"
+                className="flex items-baseline gap-1.5 rounded-xl border bg-[var(--card)] px-3.5 py-1.5"
+                style={{
+                  borderColor: "var(--border)",
+                  boxShadow: "0 1px 4px -1px var(--shadow-color)",
+                }}
               >
                 <dt className="sr-only">{label}</dt>
+                {/* Alternate amber / sage for the bold number */}
                 <dd
                   aria-hidden="true"
-                  className="font-mono text-base font-bold text-[var(--text)]"
+                  className="font-mono text-base font-bold"
+                  style={{
+                    color:
+                      accent === "amber"
+                        ? "var(--accent)"
+                        : "var(--secondary)",
+                  }}
                 >
                   {num}
                 </dd>
@@ -283,7 +316,8 @@ export default function App() {
                   style={
                     difficulty === opt
                       ? {
-                          backgroundColor: "var(--text)",
+                          /* Active: amber fill, dark forest text for contrast */
+                          backgroundColor: "var(--accent)",
                           color: "var(--page)",
                         }
                       : {
@@ -374,7 +408,8 @@ export default function App() {
                 >
                   <SectionHeading
                     icon={<Icon size={18} strokeWidth={ICON_STROKE} aria-hidden="true" />}
-                    iconColor={catPalette.light}
+                    /* Pass the dark palette color; SectionHeading uses it for the icon chip */
+                    iconColor={catPalette.dark}
                     title={cat.name}
                     count={commands.length}
                     blurb={cat.description}
@@ -432,12 +467,14 @@ export default function App() {
                 setCategory("all");
                 setDifficulty("all");
               }}
-              className="mt-5 inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white transition-all hover:brightness-105 active:scale-95"
+              className="mt-5 inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold transition-all hover:brightness-105 active:scale-95"
               style={{
                 background:
                   "linear-gradient(135deg, var(--accent), var(--accent-hover))",
+                /* Dark forest text on amber for maximum contrast */
+                color: "var(--page)",
                 boxShadow:
-                  "0 4px 14px -2px color-mix(in srgb, var(--accent) 55%, transparent)",
+                  "0 4px 14px -2px color-mix(in srgb, var(--accent) 45%, transparent)",
               }}
             >
               <RotateCcw size={15} strokeWidth={ICON_STROKE} aria-hidden="true" />
@@ -491,7 +528,8 @@ export default function App() {
                 aria-hidden="true"
               />
             }
-            iconColor="var(--accent)"
+            /* Workflows: sage icon (informational section) */
+            iconColor="var(--secondary)"
             title="Common workflows"
             blurb="Step-by-step recipes for the situations developers hit every week."
           />
@@ -604,9 +642,12 @@ function SectionHeading({
           <span
             className="rounded-full px-2 py-0.5 text-xs font-semibold"
             style={{
-              backgroundColor: "var(--hover)",
-              color: "var(--muted)",
-              border: "1px solid var(--border-subtle)",
+              /* Count badge: sage pill — informational / supporting role */
+              backgroundColor:
+                "color-mix(in srgb, var(--secondary) 14%, transparent)",
+              color: "var(--secondary)",
+              border:
+                "1px solid color-mix(in srgb, var(--secondary) 30%, transparent)",
             }}
           >
             {count}

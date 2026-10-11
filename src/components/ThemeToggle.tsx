@@ -15,10 +15,23 @@ export function ThemeToggle({ theme, onToggle }: ThemeToggleProps) {
       onClick={onToggle}
       aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
       aria-pressed={dark}
-      className="print-hidden inline-flex items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--card)] px-3.5 py-2 text-xs font-semibold text-[var(--text)] shadow-sm backdrop-blur transition-all duration-200 hover:bg-[var(--hover)] active:scale-95"
+      className="print-hidden inline-flex items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--card)] px-3.5 py-2 text-xs font-semibold text-[var(--text)] shadow-sm transition-all duration-300 hover:bg-[var(--raised)] hover:border-[var(--accent)] active:scale-95"
+      style={{
+        /* Smooth 300ms transition between modes — skipped when prefers-reduced-motion */
+        transition:
+          "background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease",
+      }}
     >
-      <span key={theme} className="star-pop inline-flex text-[var(--accent)]" aria-hidden="true">
-        {dark ? <Sun size={16} strokeWidth={ICON_STROKE} /> : <Moon size={16} strokeWidth={ICON_STROKE} />}
+      <span
+        key={theme}
+        className="star-pop inline-flex text-[var(--accent)]"
+        aria-hidden="true"
+      >
+        {dark ? (
+          <Sun size={16} strokeWidth={ICON_STROKE} />
+        ) : (
+          <Moon size={16} strokeWidth={ICON_STROKE} />
+        )}
       </span>
       <span>{dark ? "Light mode" : "Dark mode"}</span>
     </button>

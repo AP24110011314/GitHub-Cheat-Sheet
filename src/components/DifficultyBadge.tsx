@@ -9,18 +9,21 @@ interface BadgeConfig {
 }
 
 const CONFIG: Record<Difficulty, BadgeConfig> = {
+  /** Beginner → sage */
   Beginner: {
     Icon: Sprout,
     textToken: "var(--badge-beginner)",
     bgToken: "var(--badge-beginner-bg)",
     borderToken: "var(--badge-beginner-border)",
   },
+  /** Intermediate → amber */
   Intermediate: {
     Icon: Zap,
     textToken: "var(--badge-intermediate)",
     bgToken: "var(--badge-intermediate-bg)",
     borderToken: "var(--badge-intermediate-border)",
   },
+  /** Advanced → amber-brown (#B8743A in dark mode) */
   Advanced: {
     Icon: Flame,
     textToken: "var(--badge-advanced)",

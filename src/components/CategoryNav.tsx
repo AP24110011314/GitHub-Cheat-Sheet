@@ -2,7 +2,7 @@ import { Star } from "lucide-react";
 import type { CSSProperties } from "react";
 import type { CategoryId } from "../data/commands";
 import { CATEGORIES } from "../data/commands";
-import { CATEGORY_ICONS, CATEGORY_PALETTE, ICON_STROKE } from "./categoryIcons";
+import { CATEGORY_ICONS, ICON_STROKE } from "./categoryIcons";
 
 export type CategoryFilter = CategoryId | "all" | "favorites";
 
@@ -22,15 +22,20 @@ export function CategoryNav({
   totalCount,
 }: CategoryNavProps) {
   const base =
-    "inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold whitespace-nowrap transition-all duration-150 active:scale-95";
+    "inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold whitespace-nowrap transition-all duration-200 active:scale-95";
 
+  /**
+   * Active tab: solid amber fill (#DB9558) with very dark text so contrast is AA.
+   * Hover (inactive): amber border + faint amber tint background.
+   * Inactive: card surface + border + muted text.
+   */
   const pillStyle = (isActive: boolean): CSSProperties =>
     isActive
       ? {
           borderColor: "transparent",
-          background: "linear-gradient(135deg, var(--accent), var(--accent-hover))",
-          color: "#ffffff",
-          boxShadow: "0 4px 12px -2px color-mix(in srgb, var(--accent) 55%, transparent)",
+          backgroundColor: "var(--accent)",
+          color: "var(--page)",            // dark forest green on amber = high contrast
+          boxShadow: "0 0 12px color-mix(in srgb, var(--accent) 35%, transparent)",
         }
       : {
           borderColor: "var(--border)",
@@ -40,14 +45,21 @@ export function CategoryNav({
 
   const countStyle = (isActive: boolean): CSSProperties =>
     isActive
-      ? { backgroundColor: "rgba(255, 255, 255, 0.28)", color: "#ffffff" }
-      : { backgroundColor: "var(--hover)", color: "var(--muted)" };
+      ? {
+          backgroundColor: "rgba(18, 23, 15, 0.25)",  // dark forest tint
+          color: "var(--page)",
+        }
+      : {
+          backgroundColor: "var(--raised)",
+          color: "var(--muted)",
+        };
 
   return (
     <nav
       aria-label="Command categories"
       className="print-hidden no-scrollbar -mx-1 flex gap-2 overflow-x-auto px-1 py-1"
     >
+      {/* All */}
       <button
         type="button"
         onClick={() => onSelect("all")}
@@ -57,13 +69,14 @@ export function CategoryNav({
       >
         All
         <span
-          className="rounded-full px-1.5 py-0.2 text-[11px] font-semibold"
+          className="rounded-full px-1.5 text-[11px] font-bold"
           style={countStyle(selected === "all")}
         >
           {totalCount}
         </span>
       </button>
 
+      {/* Favorites */}
       <button
         type="button"
         onClick={() => onSelect("favorites")}
@@ -79,17 +92,18 @@ export function CategoryNav({
         />
         Favorites
         <span
-          className="rounded-full px-1.5 py-0.2 text-[11px] font-semibold"
+          className="rounded-full px-1.5 text-[11px] font-bold"
           style={countStyle(selected === "favorites")}
         >
           {favoritesCount}
         </span>
       </button>
 
+      {/* Category pills */}
       {CATEGORIES.map((c) => {
         const Icon = CATEGORY_ICONS[c.id];
         const isActive = selected === c.id;
-        const iconColor = isActive ? "#ffffff" : CATEGORY_PALETTE[c.id].light;
+
 
         return (
           <button
@@ -100,15 +114,16 @@ export function CategoryNav({
             className={base}
             style={pillStyle(isActive)}
           >
+            {/* Icon: dark (isActive) mode = page green; inactive = sage or amber per palette */}
             <Icon
               size={13}
               strokeWidth={ICON_STROKE}
               aria-hidden="true"
-              color={iconColor}
+              color={isActive ? "var(--page)" : `var(--secondary)`}
             />
             {c.name}
             <span
-              className="rounded-full px-1.5 py-0.2 text-[11px] font-semibold"
+              className="rounded-full px-1.5 text-[11px] font-bold"
               style={countStyle(isActive)}
             >
               {counts[c.id] ?? 0}
