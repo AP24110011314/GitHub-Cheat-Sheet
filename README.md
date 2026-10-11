@@ -5,13 +5,16 @@ Works **fully offline** as a static site — no backend, no tracking.
 
 ## Screenshots
 
-> Add screenshots here after your first run:
->
-> - `docs/screenshots/light.png` — full page in light mode
-> - `docs/screenshots/dark.png` — full page in dark mode
-> - `docs/screenshots/mobile.png` — mobile layout
->
-> Tip: run `npm run dev`, open http://localhost:5173, and capture at 1440px + 390px widths.
+## Screenshots
+
+### Screenshot 1
+![Screenshot 1](screenshots/1.png)
+
+### Screenshot 2
+![Screenshot 2](screenshots/2.png)
+
+### Screenshot 3
+![Screenshot 3](screenshots/3.png)
 
 ## Features
 
