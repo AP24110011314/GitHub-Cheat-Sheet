@@ -35,18 +35,18 @@ export interface GitCommand {
 }
 
 export const CATEGORIES: Category[] = [
-  { id: "setup", name: "Setup & Config", description: "Install checks, identity, aliases and defaults.", color: "#6b7280" },
-  { id: "creating", name: "Creating Repos", description: "Init, clone and first push.", color: "#0ea5e9" },
-  { id: "staging", name: "Staging & Committing", description: "Stage hunks, diff and write commits.", color: "#22c55e" },
-  { id: "branching", name: "Branching & Merging", description: "Switch, branch, merge and worktrees.", color: "#a855f7" },
-  { id: "remote", name: "Remote & Syncing", description: "Fetch, pull, push and remotes.", color: "#f59e0b" },
-  { id: "undoing", name: "Undoing Changes", description: "Restore, reset, revert and clean up.", color: "#ef4444" },
-  { id: "stash", name: "Stash", description: "Shelve work in progress safely.", color: "#14b8a6" },
-  { id: "tags", name: "Tags", description: "Mark releases and share tags.", color: "#eab308" },
-  { id: "rebase", name: "Rebase", description: "Rewrite and replay commit history.", color: "#ec4899" },
-  { id: "inspecting", name: "Inspecting & Logs", description: "Log, blame, bisect and search history.", color: "#6366f1" },
-  { id: "gh", name: "GitHub CLI (gh)", description: "Repos, PRs and issues from the terminal.", color: "#111827" },
-  { id: "collab", name: "Collaboration", description: "Forks, PRs, reviews and releases.", color: "#f97316" },
+  { id: "setup", name: "Setup & Config", description: "Install checks, identity, aliases and defaults.", color: "#8b949e" },
+  { id: "creating", name: "Creating Repos", description: "Init, clone and first push.", color: "#2f81f7" },
+  { id: "staging", name: "Staging & Committing", description: "Stage hunks, diff and write commits.", color: "#3fb950" },
+  { id: "branching", name: "Branching & Merging", description: "Switch, branch, merge and worktrees.", color: "#a371f7" },
+  { id: "remote", name: "Remote & Syncing", description: "Fetch, pull, push and remotes.", color: "#d29922" },
+  { id: "undoing", name: "Undoing Changes", description: "Restore, reset, revert and clean up.", color: "#f85149" },
+  { id: "stash", name: "Stash", description: "Shelve work in progress safely.", color: "#2f81f7" },
+  { id: "tags", name: "Tags", description: "Mark releases and share tags.", color: "#a371f7" },
+  { id: "rebase", name: "Rebase", description: "Rewrite and replay commit history.", color: "#f85149" },
+  { id: "inspecting", name: "Inspecting & Logs", description: "Log, blame, bisect and search history.", color: "#8b949e" },
+  { id: "gh", name: "GitHub CLI (gh)", description: "Repos, PRs and issues from the terminal.", color: "#3fb950" },
+  { id: "collab", name: "Collaboration", description: "Forks, PRs, reviews and releases.", color: "#d29922" },
 ];
 
 export const COMMANDS: GitCommand[] = [

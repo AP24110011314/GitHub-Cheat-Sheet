@@ -1,4 +1,6 @@
+import { Search, X } from "lucide-react";
 import type { RefObject } from "react";
+import { ICON_STROKE } from "./categoryIcons";
 
 interface SearchBarProps {
   value: string;
@@ -15,18 +17,13 @@ export function SearchBar({ value, onChange, onClear, inputRef, resultCount, tot
       <label htmlFor="command-search" className="sr-only">
         Search commands
       </label>
-      <div className="group relative transition-all duration-200 focus-within:-translate-y-px focus-within:drop-shadow-[0_8px_24px_rgba(99,102,241,0.25)]">
-        <svg
+      <div className="group relative transition-all duration-200 focus-within:-translate-y-px">
+        <Search
+          size={20}
+          strokeWidth={ICON_STROKE}
           aria-hidden="true"
-          viewBox="0 0 20 20"
-          fill="none"
-          className="pointer-events-none absolute top-1/2 left-4 h-5 w-5 -translate-y-1/2 text-slate-400 transition-colors group-focus-within:text-indigo-500"
-        >
-          <path
-            d="M9 2a7 7 0 1 0 4.9 12L18 18l1-1-4.1-4.1A7 7 0 0 0 9 2Zm0 2a5 5 0 1 1 0 10 5 5 0 0 1 0-10Z"
-            fill="currentColor"
-          />
-        </svg>
+          className="pointer-events-none absolute top-1/2 left-4 -translate-y-1/2 text-[var(--muted)] transition-colors group-focus-within:text-[var(--accent)]"
+        />
         <input
           ref={inputRef}
           id="command-search"
@@ -37,7 +34,16 @@ export function SearchBar({ value, onChange, onClear, inputRef, resultCount, tot
           onChange={(e) => onChange(e.target.value)}
           placeholder="Search 144 commands… try “rebase”, “stash”, “gh pr”"
           aria-describedby="search-count"
-          className="h-13 w-full rounded-2xl border border-slate-200 bg-white py-3.5 pr-24 pl-11 text-[15px] text-slate-900 shadow-[0_2px_12px_-4px_rgba(15,23,42,0.15)] outline-none placeholder:text-slate-400 focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/15 dark:border-white/10 dark:bg-slate-900/90 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-indigo-500"
+          className="h-13 w-full rounded-2xl border bg-[var(--page)] py-3.5 pr-28 pl-12 text-[15px] text-[var(--text)] shadow-[0_8px_30px_-12px_rgba(31,35,40,0.4)] outline-none placeholder:text-[var(--muted)] focus:ring-4"
+          style={{ borderColor: "var(--border)" }}
+          onFocus={(e) => {
+            e.currentTarget.style.borderColor = "var(--accent)";
+            e.currentTarget.style.boxShadow = "0 0 0 4px color-mix(in srgb, var(--accent) 18%, transparent)";
+          }}
+          onBlur={(e) => {
+            e.currentTarget.style.borderColor = "var(--border)";
+            e.currentTarget.style.boxShadow = "";
+          }}
         />
         <div className="absolute top-1/2 right-3 flex -translate-y-1/2 items-center gap-1.5">
           {value && (
@@ -45,22 +51,26 @@ export function SearchBar({ value, onChange, onClear, inputRef, resultCount, tot
               type="button"
               onClick={onClear}
               aria-label="Clear search"
-              className="rounded-lg bg-slate-100 px-2 py-1 text-xs font-medium text-slate-500 transition-colors hover:bg-slate-200 hover:text-slate-800 dark:bg-white/10 dark:text-slate-300 dark:hover:bg-white/20 dark:hover:text-white"
+              className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-medium transition-colors hover:bg-[var(--hover)]"
+              style={{ color: "var(--muted)" }}
             >
-              Clear ✕
+              <X size={13} strokeWidth={ICON_STROKE} aria-hidden="true" />
+              Clear
             </button>
           )}
           <kbd
             aria-hidden="true"
-            className="hidden rounded-lg border border-slate-200 bg-slate-50 px-2 py-1 font-mono text-[11px] font-semibold text-slate-500 sm:inline dark:border-white/10 dark:bg-white/5 dark:text-slate-400"
+            title="Press / to focus search"
+            className="hidden rounded-lg border px-2 py-1 font-mono text-[11px] font-semibold sm:inline"
+            style={{ borderColor: "var(--border)", color: "var(--muted)", backgroundColor: "var(--hover)" }}
           >
             /
           </kbd>
         </div>
       </div>
-      <p id="search-count" aria-live="polite" className="mt-2 text-xs text-slate-500 dark:text-slate-400">
-        Showing <strong className="font-semibold text-slate-700 dark:text-slate-200">{resultCount}</strong> of{" "}
-        {totalCount} commands
+      <p id="search-count" aria-live="polite" className="mt-2 text-center text-xs text-[var(--muted)]">
+        Showing <strong className="font-semibold text-[var(--text)]">{resultCount}</strong> of {totalCount}{" "}
+        commands
       </p>
     </div>
   );
