@@ -3,8 +3,6 @@
 A fast, beautiful, searchable cheat sheet of Git and GitHub commands for daily reference.
 Works **fully offline** as a static site — no backend, no tracking.
 
-## Screenshots
-
 <h2 align="center">📸 Project Screenshots</h2>
 
 <p align="center">
@@ -13,7 +11,7 @@ Works **fully offline** as a static site — no backend, no tracking.
 
 ---
 
-<h3>🌞 1. Light Mode</h3>
+<h3 align="center">🌞 1. Light Mode</h3>
 
 <p align="center">
   <img src="screenshots/1.png" alt="GitHub Cheat Sheet - Light Mode" width="100%">
@@ -25,7 +23,7 @@ Works **fully offline** as a static site — no backend, no tracking.
 
 ---
 
-<h3>🌙 2. Dark Mode</h3>
+<h3 align="center">🌙 2. Dark Mode</h3>
 
 <p align="center">
   <img src="screenshots/2.png" alt="GitHub Cheat Sheet - Dark Mode" width="100%">
@@ -37,7 +35,7 @@ Works **fully offline** as a static site — no backend, no tracking.
 
 ---
 
-<h3>📱 3. Responsive Interface</h3>
+<h3 align="center">📱 3. Responsive Interface</h3>
 
 <p align="center">
   <img src="screenshots/3.png" alt="GitHub Cheat Sheet - Responsive Interface" width="100%">
