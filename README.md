@@ -5,16 +5,53 @@ Works **fully offline** as a static site — no backend, no tracking.
 
 ## Screenshots
 
-## Screenshots
+<h2 align="center">📸 Project Screenshots</h2>
 
-### Screenshot 1
-![Screenshot 1](screenshots/1.png)
+<p align="center">
+  A visual preview of the <strong>GitHub Commands Cheat Sheet</strong>.
+</p>
 
-### Screenshot 2
-![Screenshot 2](screenshots/2.png)
+---
 
-### Screenshot 3
-![Screenshot 3](screenshots/3.png)
+<h3>🌞 1. Light Mode</h3>
+
+<p align="center">
+  <img src="screenshots/1.png" alt="GitHub Cheat Sheet - Light Mode" width="100%">
+</p>
+
+<p align="center">
+  <em>Clean interface with a light theme.</em>
+</p>
+
+---
+
+<h3>🌙 2. Dark Mode</h3>
+
+<p align="center">
+  <img src="screenshots/2.png" alt="GitHub Cheat Sheet - Dark Mode" width="100%">
+</p>
+
+<p align="center">
+  <em>Dark theme for a comfortable viewing experience.</em>
+</p>
+
+---
+
+<h3>📱 3. Responsive Interface</h3>
+
+<p align="center">
+  <img src="screenshots/3.png" alt="GitHub Cheat Sheet - Responsive Interface" width="100%">
+</p>
+
+<p align="center">
+  <em>Project interface and layout preview.</em>
+</p>
+
+---
+
+<p align="center">
+  ⭐ If you find this project useful, consider giving it a star!
+</p>
 
 ## Features
 
