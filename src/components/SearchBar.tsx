@@ -15,12 +15,12 @@ export function SearchBar({ value, onChange, onClear, inputRef, resultCount, tot
       <label htmlFor="command-search" className="sr-only">
         Search commands
       </label>
-      <div className="relative">
+      <div className="group relative transition-all duration-200 focus-within:-translate-y-px focus-within:drop-shadow-[0_8px_24px_rgba(99,102,241,0.25)]">
         <svg
           aria-hidden="true"
           viewBox="0 0 20 20"
           fill="none"
-          className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-slate-400"
+          className="pointer-events-none absolute top-1/2 left-4 h-5 w-5 -translate-y-1/2 text-slate-400 transition-colors group-focus-within:text-indigo-500"
         >
           <path
             d="M9 2a7 7 0 1 0 4.9 12L18 18l1-1-4.1-4.1A7 7 0 0 0 9 2Zm0 2a5 5 0 1 1 0 10 5 5 0 0 1 0-10Z"
@@ -35,31 +35,32 @@ export function SearchBar({ value, onChange, onClear, inputRef, resultCount, tot
           spellCheck={false}
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          placeholder="Search commands, descriptions, keywords…"
+          placeholder="Search 144 commands… try “rebase”, “stash”, “gh pr”"
           aria-describedby="search-count"
-          className="w-full rounded-lg border border-slate-300 bg-white py-2.5 pr-20 pl-9 font-mono text-sm text-slate-900 placeholder:font-sans placeholder:text-slate-400 focus:border-blue-500 focus:outline-none dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+          className="h-13 w-full rounded-2xl border border-slate-200 bg-white py-3.5 pr-24 pl-11 text-[15px] text-slate-900 shadow-[0_2px_12px_-4px_rgba(15,23,42,0.15)] outline-none placeholder:text-slate-400 focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/15 dark:border-white/10 dark:bg-slate-900/90 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-indigo-500"
         />
-        <div className="absolute top-1/2 right-2 flex -translate-y-1/2 items-center gap-1.5">
+        <div className="absolute top-1/2 right-3 flex -translate-y-1/2 items-center gap-1.5">
           {value && (
             <button
               type="button"
               onClick={onClear}
               aria-label="Clear search"
-              className="rounded px-1.5 py-0.5 text-xs text-slate-500 hover:bg-slate-100 hover:text-slate-800 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
+              className="rounded-lg bg-slate-100 px-2 py-1 text-xs font-medium text-slate-500 transition-colors hover:bg-slate-200 hover:text-slate-800 dark:bg-white/10 dark:text-slate-300 dark:hover:bg-white/20 dark:hover:text-white"
             >
-              ✕
+              Clear ✕
             </button>
           )}
           <kbd
             aria-hidden="true"
-            className="hidden rounded border border-slate-300 bg-slate-50 px-1.5 py-0.5 font-sans text-[11px] text-slate-500 sm:inline dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400"
+            className="hidden rounded-lg border border-slate-200 bg-slate-50 px-2 py-1 font-mono text-[11px] font-semibold text-slate-500 sm:inline dark:border-white/10 dark:bg-white/5 dark:text-slate-400"
           >
             /
           </kbd>
         </div>
       </div>
-      <p id="search-count" aria-live="polite" className="mt-1.5 text-xs text-slate-500 dark:text-slate-400">
-        Showing {resultCount} of {totalCount} commands
+      <p id="search-count" aria-live="polite" className="mt-2 text-xs text-slate-500 dark:text-slate-400">
+        Showing <strong className="font-semibold text-slate-700 dark:text-slate-200">{resultCount}</strong> of{" "}
+        {totalCount} commands
       </p>
     </div>
   );
