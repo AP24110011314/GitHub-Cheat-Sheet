@@ -1,0 +1,60 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Visible, consistent focus states for keyboard users */
+:where(a, button, input, select, [tabindex]):focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+.dark :where(a, button, input, select, [tabindex]):focus-visible {
+  outline-color: #60a5fa;
+}
+
+/* Search match highlight */
+mark.search-match {
+  background: #fef08a;
+  color: inherit;
+  border-radius: 3px;
+  padding: 0 1px;
+}
+.dark mark.search-match {
+  background: #854d0e;
+  color: #fefce8;
+}
+
+/* ---- Print: clean cheat-sheet output, Download-as-PDF uses this too ---- */
+@media print {
+  .print-hidden {
+    display: none !important;
+  }
+  body {
+    background: #fff !important;
+    color: #000 !important;
+    font-size: 11px;
+  }
+  .print-card {
+    break-inside: avoid;
+    border: 1px solid #ddd !important;
+    box-shadow: none !important;
+  }
+  main {
+    max-width: 100% !important;
+  }
+}
