@@ -2,7 +2,7 @@ import { Star } from "lucide-react";
 import type { CSSProperties } from "react";
 import type { CategoryId } from "../data/commands";
 import { CATEGORIES } from "../data/commands";
-import { CATEGORY_ICONS, ICON_STROKE } from "./categoryIcons";
+import { CATEGORY_ICONS, CATEGORY_PALETTE, ICON_STROKE } from "./categoryIcons";
 
 export type CategoryFilter = CategoryId | "all" | "favorites";
 
@@ -14,23 +14,33 @@ interface CategoryNavProps {
   totalCount: number;
 }
 
-export function CategoryNav({ selected, onSelect, counts, favoritesCount, totalCount }: CategoryNavProps) {
+export function CategoryNav({
+  selected,
+  onSelect,
+  counts,
+  favoritesCount,
+  totalCount,
+}: CategoryNavProps) {
   const base =
-    "inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium whitespace-nowrap transition-all duration-150 active:scale-95";
+    "inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold whitespace-nowrap transition-all duration-150 active:scale-95";
 
   const pillStyle = (isActive: boolean): CSSProperties =>
     isActive
       ? {
           borderColor: "transparent",
-          background: "linear-gradient(135deg, var(--accent), var(--purple))",
-          color: "#fff",
-          boxShadow: "0 4px 14px -4px color-mix(in srgb, var(--accent) 60%, transparent)",
+          background: "linear-gradient(135deg, var(--accent), var(--accent-hover))",
+          color: "#ffffff",
+          boxShadow: "0 4px 12px -2px color-mix(in srgb, var(--accent) 55%, transparent)",
         }
-      : { borderColor: "var(--border)", backgroundColor: "var(--card)", color: "var(--muted)" };
+      : {
+          borderColor: "var(--border)",
+          backgroundColor: "var(--card)",
+          color: "var(--muted)",
+        };
 
   const countStyle = (isActive: boolean): CSSProperties =>
     isActive
-      ? { backgroundColor: "rgba(255,255,255,0.25)" }
+      ? { backgroundColor: "rgba(255, 255, 255, 0.28)", color: "#ffffff" }
       : { backgroundColor: "var(--hover)", color: "var(--muted)" };
 
   return (
@@ -46,10 +56,14 @@ export function CategoryNav({ selected, onSelect, counts, favoritesCount, totalC
         style={pillStyle(selected === "all")}
       >
         All
-        <span className="rounded-full px-1.5 text-[11px] font-semibold" style={countStyle(selected === "all")}>
+        <span
+          className="rounded-full px-1.5 py-0.2 text-[11px] font-semibold"
+          style={countStyle(selected === "all")}
+        >
           {totalCount}
         </span>
       </button>
+
       <button
         type="button"
         onClick={() => onSelect("favorites")}
@@ -65,15 +79,18 @@ export function CategoryNav({ selected, onSelect, counts, favoritesCount, totalC
         />
         Favorites
         <span
-          className="rounded-full px-1.5 text-[11px] font-semibold"
+          className="rounded-full px-1.5 py-0.2 text-[11px] font-semibold"
           style={countStyle(selected === "favorites")}
         >
           {favoritesCount}
         </span>
       </button>
+
       {CATEGORIES.map((c) => {
         const Icon = CATEGORY_ICONS[c.id];
         const isActive = selected === c.id;
+        const iconColor = isActive ? "#ffffff" : CATEGORY_PALETTE[c.id].light;
+
         return (
           <button
             key={c.id}
@@ -87,10 +104,13 @@ export function CategoryNav({ selected, onSelect, counts, favoritesCount, totalC
               size={13}
               strokeWidth={ICON_STROKE}
               aria-hidden="true"
-              color={isActive ? "#fff" : c.color}
+              color={iconColor}
             />
             {c.name}
-            <span className="rounded-full px-1.5 text-[11px] font-semibold" style={countStyle(isActive)}>
+            <span
+              className="rounded-full px-1.5 py-0.2 text-[11px] font-semibold"
+              style={countStyle(isActive)}
+            >
               {counts[c.id] ?? 0}
             </span>
           </button>

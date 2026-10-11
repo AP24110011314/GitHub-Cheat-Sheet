@@ -11,15 +11,22 @@ interface SearchBarProps {
   totalCount: number;
 }
 
-export function SearchBar({ value, onChange, onClear, inputRef, resultCount, totalCount }: SearchBarProps) {
+export function SearchBar({
+  value,
+  onChange,
+  onClear,
+  inputRef,
+  resultCount,
+  totalCount,
+}: SearchBarProps) {
   return (
     <div role="search" className="w-full">
       <label htmlFor="command-search" className="sr-only">
         Search commands
       </label>
-      <div className="group relative transition-all duration-200 focus-within:-translate-y-px">
+      <div className="group relative transition-all duration-200">
         <Search
-          size={20}
+          size={18}
           strokeWidth={ICON_STROKE}
           aria-hidden="true"
           className="pointer-events-none absolute top-1/2 left-4 -translate-y-1/2 text-[var(--muted)] transition-colors group-focus-within:text-[var(--accent)]"
@@ -32,17 +39,24 @@ export function SearchBar({ value, onChange, onClear, inputRef, resultCount, tot
           spellCheck={false}
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          placeholder="Search 144 commands… try “rebase”, “stash”, “gh pr”"
+          placeholder="Search commands… try “rebase”, “stash”, “gh pr”"
           aria-describedby="search-count"
-          className="h-13 w-full rounded-2xl border bg-[var(--page)] py-3.5 pr-28 pl-12 text-[15px] text-[var(--text)] shadow-[0_8px_30px_-12px_rgba(31,35,40,0.4)] outline-none placeholder:text-[var(--muted)] focus:ring-4"
-          style={{ borderColor: "var(--border)" }}
+          className="h-13 w-full rounded-2xl border py-3.5 pr-28 pl-11 text-[15px] outline-none transition-all placeholder:text-[var(--muted)]"
+          style={{
+            backgroundColor: "var(--card)",
+            borderColor: "var(--border)",
+            color: "var(--text)",
+            boxShadow: "0 4px 16px -4px var(--shadow-color)",
+          }}
           onFocus={(e) => {
             e.currentTarget.style.borderColor = "var(--accent)";
-            e.currentTarget.style.boxShadow = "0 0 0 4px color-mix(in srgb, var(--accent) 18%, transparent)";
+            e.currentTarget.style.boxShadow =
+              "0 0 0 3px color-mix(in srgb, var(--accent) 24%, transparent)";
           }}
           onBlur={(e) => {
             e.currentTarget.style.borderColor = "var(--border)";
-            e.currentTarget.style.boxShadow = "";
+            e.currentTarget.style.boxShadow =
+              "0 4px 16px -4px var(--shadow-color)";
           }}
         />
         <div className="absolute top-1/2 right-3 flex -translate-y-1/2 items-center gap-1.5">
@@ -62,15 +76,24 @@ export function SearchBar({ value, onChange, onClear, inputRef, resultCount, tot
             aria-hidden="true"
             title="Press / to focus search"
             className="hidden rounded-lg border px-2 py-1 font-mono text-[11px] font-semibold sm:inline"
-            style={{ borderColor: "var(--border)", color: "var(--muted)", backgroundColor: "var(--hover)" }}
+            style={{
+              borderColor: "var(--border)",
+              color: "var(--muted)",
+              backgroundColor: "var(--hover)",
+            }}
           >
             /
           </kbd>
         </div>
       </div>
-      <p id="search-count" aria-live="polite" className="mt-2 text-center text-xs text-[var(--muted)]">
-        Showing <strong className="font-semibold text-[var(--text)]">{resultCount}</strong> of {totalCount}{" "}
-        commands
+      <p
+        id="search-count"
+        aria-live="polite"
+        className="mt-2 text-center text-xs text-[var(--muted)]"
+      >
+        Showing{" "}
+        <strong className="font-semibold text-[var(--text)]">{resultCount}</strong> of{" "}
+        {totalCount} commands
       </p>
     </div>
   );

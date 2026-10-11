@@ -15,12 +15,12 @@ export function ThemeToggle({ theme, onToggle }: ThemeToggleProps) {
       onClick={onToggle}
       aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
       aria-pressed={dark}
-      className="print-hidden inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/10 px-3 py-2 text-sm font-medium text-white backdrop-blur transition-all hover:bg-white/20 active:scale-95"
+      className="print-hidden inline-flex items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--card)] px-3.5 py-2 text-xs font-semibold text-[var(--text)] shadow-sm backdrop-blur transition-all duration-200 hover:bg-[var(--hover)] active:scale-95"
     >
-      <span key={theme} className="star-pop inline-flex" aria-hidden="true">
+      <span key={theme} className="star-pop inline-flex text-[var(--accent)]" aria-hidden="true">
         {dark ? <Sun size={16} strokeWidth={ICON_STROKE} /> : <Moon size={16} strokeWidth={ICON_STROKE} />}
       </span>
-      {dark ? "Light" : "Dark"}
+      <span>{dark ? "Light mode" : "Dark mode"}</span>
     </button>
   );
 }

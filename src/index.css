@@ -9,42 +9,100 @@
     monospace;
 }
 
-/* ── GitHub Primer-inspired palette, light by default ─────────────── */
+/* ── Warm Earthy Brand Palette ─────────────────────────────────────── */
 :root {
-  --page: #ffffff;
-  --card: #f6f8fa;
-  --hover: #eaeef2;
-  --border: #d0d7de;
-  --text: #1f2328;
-  --muted: #656d76;
-  --accent: #0969da;
-  --success: #1a7f37;
-  --warning: #9a6700;
-  --danger: #cf222e;
-  --purple: #8250df;
-  --code-bg: #0d1117;
-  --code-border: rgba(255, 255, 255, 0.12);
-  --mark-bg: #fff8c5;
-  --mark-text: inherit;
+  /* Light mode: Warm Cream + Sage */
+  --page: #FCF9EA;
+  --card: #FFFDF5;
+  --accent: #DB9558;
+  --accent-hover: #C98246;
+  --accent-text: #964F17;
+  --secondary: #97A87A;
+  --secondary-text: #4C6036;
+  --border: #A8BBA3;
+  --border-subtle: rgba(168, 187, 163, 0.45);
+  --hover: rgba(168, 187, 163, 0.20);
+  --text: #3B2A1A;
+  --muted: #7A6650;
+
+  /* Badges & Destructive semantics */
+  --badge-beginner: #4E6539;
+  --badge-beginner-bg: rgba(151, 168, 122, 0.18);
+  --badge-beginner-border: rgba(151, 168, 122, 0.55);
+  --badge-intermediate: #9A5418;
+  --badge-intermediate-bg: rgba(219, 149, 88, 0.18);
+  --badge-intermediate-border: rgba(219, 149, 88, 0.55);
+  --badge-advanced: #B3440C;
+  --badge-advanced-bg: rgba(212, 98, 26, 0.18);
+  --badge-advanced-border: rgba(212, 98, 26, 0.55);
+
+  --destructive: #B8470E;
+  --destructive-bg: rgba(212, 98, 26, 0.12);
+  --destructive-border: rgba(212, 98, 26, 0.45);
+
+  /* Code block tokens */
+  --code-bg: #EAEFE3;
+  --code-border: #A8BBA3;
+  --code-text: #3B2A1A;
+  --code-cmd: #9C5216;
+  --code-flag: #7A6650;
+  --code-str: #4F6A38;
+  --code-prompt: #5B7543;
+
+  /* Shadows and search highlight */
+  --shadow-color: rgba(59, 42, 26, 0.08);
+  --shadow-hover: rgba(59, 42, 26, 0.16);
+  --mark-bg: rgba(219, 149, 88, 0.35);
+  --mark-text: #2A1A0E;
+
   color-scheme: light;
 }
 
 .dark {
-  --page: #0d1117;
-  --card: #161b22;
-  --hover: #21262d;
-  --border: #30363d;
-  --text: #e6edf3;
-  --muted: #8b949e;
-  --accent: #2f81f7;
-  --success: #3fb950;
-  --warning: #d29922;
-  --danger: #f85149;
-  --purple: #a371f7;
-  --code-bg: #010409;
-  --code-border: #30363d;
-  --mark-bg: #7d4e00;
-  --mark-text: #fff8c5;
+  /* Dark mode: Deep Brown + Amber */
+  --page: #2A1A0E;
+  --card: #3A2616;
+  --accent: #F4AE52;
+  --accent-hover: #F8BC6D;
+  --accent-text: #F4AE52;
+  --secondary: #D4621A;
+  --secondary-text: #F88942;
+  --border: #4A3220;
+  --border-subtle: rgba(74, 50, 32, 0.7);
+  --hover: rgba(254, 243, 226, 0.08);
+  --text: #FEF3E2;
+  --muted: rgba(254, 243, 226, 0.65);
+
+  /* Badges & Destructive semantics */
+  --badge-beginner: #A5BF8B;
+  --badge-beginner-bg: rgba(151, 168, 122, 0.20);
+  --badge-beginner-border: rgba(151, 168, 122, 0.45);
+  --badge-intermediate: #F4AE52;
+  --badge-intermediate-bg: rgba(244, 174, 82, 0.20);
+  --badge-intermediate-border: rgba(244, 174, 82, 0.45);
+  --badge-advanced: #E87228;
+  --badge-advanced-bg: rgba(212, 98, 26, 0.22);
+  --badge-advanced-border: rgba(212, 98, 26, 0.50);
+
+  --destructive: #D4621A;
+  --destructive-bg: rgba(212, 98, 26, 0.20);
+  --destructive-border: rgba(212, 98, 26, 0.55);
+
+  /* Code block tokens */
+  --code-bg: #1F1309;
+  --code-border: #4A3220;
+  --code-text: #FEF3E2;
+  --code-cmd: #F4AE52;
+  --code-flag: rgba(254, 243, 226, 0.65);
+  --code-str: #A5BF8B;
+  --code-prompt: #F4AE52;
+
+  /* Shadows and search highlight */
+  --shadow-color: rgba(0, 0, 0, 0.4);
+  --shadow-hover: rgba(0, 0, 0, 0.65);
+  --mark-bg: rgba(244, 174, 82, 0.35);
+  --mark-text: #FEF3E2;
+
   color-scheme: dark;
 }
 
@@ -64,14 +122,15 @@ body {
 }
 
 ::selection {
-  background: color-mix(in srgb, var(--accent) 30%, transparent);
+  background: color-mix(in srgb, var(--accent) 32%, transparent);
+  color: var(--text);
 }
 
 /* Visible, consistent focus states for keyboard users */
 :where(a, button, input, select, [tabindex]):focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
-  border-radius: 6px;
+  border-radius: 8px;
 }
 
 /* Search match highlight */
@@ -79,40 +138,43 @@ mark.search-match {
   background: var(--mark-bg);
   color: var(--mark-text);
   border-radius: 3px;
-  padding: 0 1px;
+  padding: 0 2px;
 }
 
-/* ── Motion (disabled for reduced-motion users) ───────────────────── */
+/* ── Motion & Micro-animations ───────────────────────────────────── */
 @keyframes rise {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(12px);
   }
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
+
 @keyframes drift {
   0%,
   100% {
     transform: translate(0, 0) scale(1);
   }
   50% {
-    transform: translate(24px, -16px) scale(1.08);
+    transform: translate(20px, -14px) scale(1.06);
   }
 }
+
 @keyframes pop {
   0% {
-    transform: scale(0.6);
+    transform: scale(0.65);
   }
   55% {
-    transform: scale(1.25);
+    transform: scale(1.22);
   }
   100% {
     transform: scale(1);
   }
 }
+
 @keyframes fade-in {
   from {
     opacity: 0;
@@ -121,18 +183,23 @@ mark.search-match {
     opacity: 1;
   }
 }
+
 .card-enter {
-  animation: rise 0.35s ease-out both;
+  animation: rise 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
+
 .hero-enter {
   animation: fade-in 0.5s ease-out both;
 }
+
 .hero-orb {
-  animation: drift 14s ease-in-out infinite;
+  animation: drift 16s ease-in-out infinite;
 }
+
 .star-pop {
-  animation: pop 0.3s ease-out;
+  animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
+
 @media (prefers-reduced-motion: reduce) {
   .card-enter,
   .hero-enter,
@@ -148,16 +215,16 @@ mark.search-match {
   }
 }
 
-/* Slim scrollbars inside terminal code blocks */
+/* Custom scrollbars inside terminal code blocks */
 .term-scroll {
   scrollbar-width: thin;
-  scrollbar-color: #57606a transparent;
+  scrollbar-color: var(--border) transparent;
 }
 .term-scroll::-webkit-scrollbar {
   height: 6px;
 }
 .term-scroll::-webkit-scrollbar-thumb {
-  background: #57606a;
+  background: var(--border);
   border-radius: 999px;
 }
 
@@ -169,20 +236,21 @@ mark.search-match {
   display: none;
 }
 
-/* ---- Print: clean cheat-sheet output, Download-as-PDF uses this too ---- */
+/* ── Print / PDF Styles ──────────────────────────────────────────── */
 @media print {
   .print-hidden {
     display: none !important;
   }
   body {
-    background: #fff !important;
-    color: #000 !important;
+    background: #ffffff !important;
+    color: #111111 !important;
     font-size: 11px;
   }
   .print-card {
     break-inside: avoid;
-    border: 1px solid #ddd !important;
+    border: 1px solid #c0c0c0 !important;
     box-shadow: none !important;
+    background: #ffffff !important;
   }
   main {
     max-width: 100% !important;
